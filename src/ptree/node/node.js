@@ -18,7 +18,8 @@ export default class Node {
         this[prop]
     }
 
-    if (!target.hasOwnProperty(prop)) {
+    // prop is not defined in target neither as a property nor as a method
+    if (!target[prop]) {
       return undefined
     }
 
