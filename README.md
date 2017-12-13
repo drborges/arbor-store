@@ -11,63 +11,57 @@ State management made with ❤️.
 
 # Thoughts
 
-### Tree: Transactional Updates?
+### Mutation Subscriptions
 
 **Provided by** `arbor`
 
-Allow for multiple mutations to happen within the same transaction, ultimately causing a single mutation to the Tree
-
 ```js
-class App {
-
-  startTodo(index) {
-    app.state.transaction(() => {
-      const removed = app.state.todos.removeAt(index)
-      app.state.doing.push(removed)
-    })
-  }
-}
-
-class App {
-
-  @app.transaction
-  startTodo(index) {
-    const removed = app.state.todos.removeAt(index)
-    app.state.doing.push(removed)
-  }
-}
-```
-
-### @app.model: Data Layer
-
-**Provided by** `arbor-model`
-
-```jsx
-const initialState = {
+const store = new Store({
   users: [],
   board: {
     todos: [],
     doing: [],
     done: [],
   },
-}
+})
 
-const app = new arbor(initialState)
+store.subscribe("/users", (users) => console.log("users list changed!", users))
 
-app.subscribe("/users", (users) => console.log("users list changed!", users))
+store.subscribe("/users/push", (users) => console.log("New user added to array", user, users))
 
-app.subscribe("/board", (board) => console.log("TODO board was changed!", board))
+store.subscribe("/users/splice", (users, args) => console.log("Users list was spliced with", args))
+// args => [0, 1, [{ name: "New user" }]]
+// users => [{ name: "New user" }]
+
+store.subscribe("/board", (board) => console.log("TODO board was changed!", board))
 ```
 
-```js
-@app.model("/board")
-class Board {
-  constructor({ todos, doing, done }) {
-    this.todos = todos
-    this.doing = doing
-    this.done = done
-  }
+### @app.model: Data Layer
 
+**Provided by** `arbor-model`
+
+#### Data Model
+
+Model classes may be used to represent a path(s) within the State Tree. Take the following `Store` as an example:
+
+```js
+const store = new Store({
+  users: [],
+  board: {
+    todos: [],
+    doing: [],
+    done: [],
+  },
+})
+
+store.bind(User, Board, Todo)
+```
+
+A model class can then be created to represent a TODO `Board` by simple adding the decorator `@Model` with the path within the state tree containing the board data.
+
+```js
+@Model("/board")
+class Board {
   createTodo() {
     this.todos.push({ id: Math.random() })
   }
@@ -82,19 +76,19 @@ class Board {
     this.doing.push(removed.finish())
   }
 }
+```
 
-@app.model(
+Now whenever one access `store.board`, and instance of `Board` will be provided.
+
+A model class may be bound to multiple paths within the state tree as well:
+
+```js
+@Model(
   "/board/todos/:index",
   "/board/doing/:index",
   "/board/done/:index",
 )
 class Todo {
-  constructor({ title, description, status = "todo" }) {
-    this.title = title
-    this.description = description
-    this.status = status
-  }
-
   finish() {
     this.status = "done"
   }
@@ -103,26 +97,32 @@ class Todo {
     this.status = "doing"
   }
 }
+```
 
-@app.model("/users/:index")
-class User {
-  constructor({ firstName, lastName }) {
-    this.firstName = firstName
-    this.lastName = lastName
-  }
+In order to implement a model that represents a list of nodes within the state tree, simply extend the `Array` class.
 
-  get fullName(): string {
-    return `${this.firstName} ${this.lastName}`
+```js
+@Model(
+  "/board/todos",
+  "/board/doing",
+  "/board/done",
+)
+class TodoList extends Array {
+  sort() {
+    // custom sorting logic for todos
   }
 }
 ```
 
-### @app.inject: Injecting portions of the Tree into a React Component
+The model above represents different lists of TODO entries.
 
-**Provided by** `arbor-react`
+### Connecting a React component to an arbor store
+
+**Provided by** `arbor`
 
 ```jsx
-@app.inject("/users", "/board")
+import Store, { connect } from "arbor"
+
 class BoardView extends React.Component {
   render() {
     return (
@@ -134,45 +134,9 @@ class BoardView extends React.Component {
     )
   }
 }
-```
 
-```jsx
-@app.inject("/users")
-class UsersView extends React.Component {
-  render() {
-    const users = this.state.users.map(user => (
-      <li key={user.id}>{user.fullName}</li>
-    ))
-
-    return (
-      <div>
-        <ul>
-          {users}
-        </ul>
-      </div>
-    )
-  }
-}
-```
-
-Use `HOC` to timplement `@app.inject`:
-
-```js
-const inject = (...paths) => (Component) {
-  return class extends React.Component {
-    render() {
-      const parsedPaths = paths.map(path => Path.parse(path))
-      const injected = parsedPaths.reduce((injected, path) => {
-        const value = path.traverse(app.state)
-        const propName = path.nodes.pop()
-        injected[propName] = value
-        return injected
-      })
-
-      return <Component {...this.props} {...injected} />
-    }
-  }
-}
+const store = new Store(...)
+export default connect(store)(BoardView)
 ```
 
 ### arbor-timetravel Package
@@ -180,9 +144,13 @@ const inject = (...paths) => (Component) {
 Provides state timetravel functionality.
 
 ```js
-import withTimetravel from "arbor-timetravel"
+import withTimeline from "arbor-timeline"
 
-const appWithTimetravel = withTimetravel(new Tree)
-appWithTimetravel.back(2)
-appWithTimetravel.forward(1)
+const storeWithTimeline = withTimeline(new Store)
+storeWithTimeline.start()
+storeWithTimeline.previous()
+storeWithTimeline.previous()
+storeWithTimeline.previous(2)
+storeWithTimeline.next(1)
+storeWithTimeline.stop()
 ```
