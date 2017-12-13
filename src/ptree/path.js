@@ -1,3 +1,6 @@
+import cached from "./cached"
+
+@cached((...nodes) => nodes.toString())
 export default class Path {
   static root = new Path
 

@@ -19,6 +19,22 @@ describe("Path", () => {
     })
   })
 
+  describe("cache", () => {
+    it("caches path instances to avoid memory leaks", () => {
+      const path1 = new Path("users", "0", "comments")
+      const path2 = new Path("users", "0", "comments")
+
+      expect(path1).to.equal(path2)
+    })
+
+    it("different paths are different objects", () => {
+      const path1 = new Path("users", "0", "comments")
+      const path2 = new Path("users", "1", "comments")
+
+      expect(path1).to.not.equal(path2)
+    })
+  })
+
   describe("#match", () => {
     it("matches a given path", () => {
       const path1 = new Path("users", "0", "comments")
