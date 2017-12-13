@@ -1,4 +1,5 @@
-import mutations from "./mutations"
+import create from "./create"
+import mutations from "../mutations"
 
 const isMutationMethod = (prop) => Object.keys(mutations).includes(prop)
 
@@ -8,8 +9,6 @@ export default class Node {
     this.$path = $path
     this.$value = value
     this.$children = $children
-    this.$proxy = new Proxy(value, this)
-    return this.$proxy
   }
 
   get(target, prop) {
@@ -31,7 +30,7 @@ export default class Node {
     }
 
     if (!this.$children[prop]) {
-      this.$children[prop] = new Node(this.$tree, childPath, value)
+      this.$children[prop] = create(this.$tree, childPath, value)
     }
 
     return this.$children[prop]
@@ -43,25 +42,4 @@ export default class Node {
 
     return true
   }
-
-  push = (path) => (item) => {
-    this.$tree.mutate(path, mutations.push(item))
-  }
-
-  splice = (path) => (start, removeCount, ...newItems) => {
-    const removed = this.$value.slice(start, removeCount)
-    this.$tree.mutate(path, mutations.splice(start, removeCount, newItems))
-    return removed
-  }
-
-  map = (fn) => this.$value.map((_, i) => {
-    return fn(this.get(this.$value, i), i, this.$proxy)
-  })
-
-  copy = () => new Node(
-    this.$tree,
-    this.$path,
-    Array.isArray(this.$value) ? [ ...this.$value ] : {...this.$value},
-    { ...this.$children },
-  )
 }

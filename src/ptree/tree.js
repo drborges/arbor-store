@@ -1,10 +1,10 @@
 import Path from "./path"
-import Node from "./node"
 import Pubsub from "./pubsub"
+import { create } from "./node"
 
 export default class Tree {
   constructor(initialState) {
-    this.root = new Node(this, Path.root, initialState)
+    this.root = create(this, Path.root, initialState)
     this.pubsub = new Pubsub
   }
 
