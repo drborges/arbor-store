@@ -1,25 +1,6 @@
+import mutations from "./mutations"
+
 const isMutationMethod = (prop) => Object.keys(mutations).includes(prop)
-
-const mutations = {
-  set: (value) => (node, prop) => {
-    node.$value[prop] = value
-    delete node.$children[prop]
-  },
-
-  push: (item) => (node) => {
-    node.$value.push(item)
-  },
-
-  splice: (start, removeCount, newItems) => (node) => {
-    node.$value.splice(start, removeCount, ...newItems)
-
-    const childrenCount = Object.keys(node.$children).length
-    for (let i = start; i < childrenCount; i++) {
-      delete node.$children[i]
-    }
-  },
-}
-
 
 export default class Node {
   constructor($tree, $path, value, $children = {}) {
