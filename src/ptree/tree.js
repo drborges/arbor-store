@@ -1,9 +1,11 @@
 import Path from "./path"
 import Node from "./node"
+import Pubsub from "./pubsub"
 
 export default class Tree {
   constructor(initialState) {
     this.root = new Node(this, Path.root, initialState)
+    this.pubsub = new Pubsub
   }
 
   get(path) {
@@ -22,10 +24,15 @@ export default class Tree {
 
     if (childPath.match(mutationPath)) {
       mutation(parent, childProp)
+      this.pubsub.publish(Path.root, this.root)
 
     } else {
       const refreshedChild = parent.$children[childProp] = child.copy()
       this.apply(mutation, mutationPath, refreshedChild)
     }
+  }
+
+  subscribe(path = Path.root, subscriber) {
+    return this.pubsub.subscribe(path, subscriber)
   }
 }

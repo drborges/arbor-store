@@ -367,4 +367,47 @@ describe("Tree", () => {
       expect(tree.root.posts[1]).to.deep.eq({ title: "hell yeah!" })
     })
   })
+
+  describe("#subscribe", () => {
+    it("subscribes to mutations to the root of the tree", (done) => {
+      const tree = new Tree({
+        posts: [
+          { title: "nice!" },
+          { title: "sweet!" },
+          { title: "hell yeah!" },
+        ]
+      })
+
+      tree.subscribe("/", (newState) => {
+        expect(newState).to.deep.eq({
+          posts: [
+            { title: "nice!" },
+            { title: "sweet!" },
+          ]
+        })
+
+        done()
+      })
+
+      tree.root.posts.splice(2, 1)
+    })
+
+    it("unsubscribes from mutations to the tree", () => {
+      const subscriber = sinon.spy()
+      const tree = new Tree({
+        posts: [
+          { title: "nice!" },
+          { title: "sweet!" },
+          { title: "hell yeah!" },
+        ]
+      })
+
+      const unsubscribe = tree.subscribe("/", subscriber)
+      unsubscribe()
+
+      tree.root.posts.splice(2, 1)
+
+      expect(subscriber).to.have.not.been.called
+    })
+  })
 })
