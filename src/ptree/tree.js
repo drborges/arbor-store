@@ -27,7 +27,14 @@ export default class Tree {
       this.pubsub.publish(Path.root, this.root)
 
     } else {
-      const refreshedChild = parent.$children[childProp] = child.copy()
+      const childCopy = child.copy()
+      // Make sure only nodes affected by the mutation are refreshed. This allows
+      // libs such as React to make reference comparissons between objects in
+      // order to determine whether a mutation has happened and thus allowing the
+      // UI to be rerendered in an optimal fashion.
+      const refreshedChild = parent.$children[childProp] = childCopy
+      // Make sure proxies are wrapping up-to-date data
+      parent.$value[childProp] = childCopy.$value
       this.apply(mutation, mutationPath, refreshedChild)
     }
   }

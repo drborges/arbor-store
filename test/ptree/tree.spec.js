@@ -208,6 +208,26 @@ describe("Tree", () => {
      expect(tree.root.user.posts).to.be.empty
    })
 
+   /*
+    * tree -->  [root]
+    *             |
+    *           [user]
+    *          /      \
+    * name = "Diego"  [posts]
+    *                    |
+    *                   [0]
+    *                    |
+    *                   title = "Sweet!"
+    */
+   it("mutates proxy $value besides its $children proxies", () => {
+     const tree = new Tree({ user: { name: "Diego", posts: [{ title: "Sweet!" }]}})
+     const root = tree.root
+
+     tree.root.user.name = "Borges"
+
+     expect(root.$value).to.deep.eq({ user: { name: "Diego", posts: [{ title: "Sweet!" }]}})
+     expect(tree.root.$value).to.deep.eq({ user: { name: "Borges", posts: [{ title: "Sweet!" }]}})
+   })
   })
 
   describe("#push", () => {
