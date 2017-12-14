@@ -13,4 +13,16 @@ describe("Node", () => {
 
     expect(tree.root.users.hasOwnProperty(0)).to.eq(true)
   })
+
+  it("does not evaluate 'falsy' props as 'undefined'", () => {
+    const tree = new Tree({
+      active: false,
+      emptyText: "",
+      zero: 0,
+    })
+
+    expect(tree.root.active).to.eq(false)
+    expect(tree.root.emptyText).to.eq("")
+    expect(tree.root.zero).to.eq(0)
+  })
 })
