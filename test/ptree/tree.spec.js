@@ -412,6 +412,20 @@ describe("Tree", () => {
       tree.root.posts.splice(2, 1)
     })
 
+    it("subscribes to any mutations when no path is provided", (done) => {
+      const tree = new Tree({ user: { name: "Diego" }})
+
+      tree.subscribe(state => {
+        expect(state).to.deep.eq({
+          user: { name: "Borges" }
+        })
+
+        done()
+      })
+
+      tree.root.user.name = "Borges"
+    })
+
     it("unsubscribes from mutations to the tree", () => {
       const subscriber = sinon.spy()
       const tree = new Tree({
