@@ -25,4 +25,12 @@ describe("Node", () => {
     expect(tree.root.emptyText).to.eq("")
     expect(tree.root.zero).to.eq(0)
   })
+
+  it("returns 'null' for null props in target", () => {
+    const tree = new Tree({
+      data: null,
+    })
+
+    expect(tree.root.data).to.eq(null)
+  })
 })

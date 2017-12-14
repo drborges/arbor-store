@@ -22,6 +22,10 @@ export default class Node {
       return undefined
     }
 
+    if (target[prop] === null) {
+      return null
+    }
+
     const childPath = this.$path.child(prop)
     const value = target[prop]
 
