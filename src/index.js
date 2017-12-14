@@ -1,8 +1,12 @@
 import Tree, { Path, create } from "./ptree"
 import connect from "./react/connect"
+import timetravel from "./timetravel"
 
-export { Tree }
-export { connect }
+export {
+  timetravel,
+  connect,
+  Tree,
+}
 
 export default class Store {
   constructor(initialState = {}) {
