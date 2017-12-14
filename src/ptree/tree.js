@@ -1,11 +1,13 @@
 import Path from "./path"
 import Pubsub from "./pubsub"
+import Mutator from "./mutator"
 import { create } from "./node"
 
 export default class Tree {
   constructor(initialState) {
     this.root = create(this, Path.root, initialState)
     this.pubsub = new Pubsub
+    this.mutator = new Mutator(this)
   }
 
   get(path) {
@@ -14,22 +16,7 @@ export default class Tree {
 
   mutate(path, mutation) {
     this.root = this.root.copy()
-    this.apply(mutation, Path.resolve(path), this.root)
-  }
-
-  apply(mutation, mutationPath, parent) {
-    const childPath = mutationPath.subpath(parent.$path.depth)
-    const childProp = childPath.leaf
-    const child = parent.$children[childProp]
-
-    if (childPath.match(mutationPath)) {
-      mutation(parent, childProp)
-      this.pubsub.publish(Path.root, this.root)
-
-    } else {
-      const refreshedChild = parent.$children[childProp] = child.copy()
-      this.apply(mutation, mutationPath, refreshedChild)
-    }
+    this.mutator.apply(mutation, Path.resolve(path), this.root)
   }
 
   subscribe(path = Path.root, subscriber) {
