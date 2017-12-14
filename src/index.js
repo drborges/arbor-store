@@ -1,12 +1,24 @@
-import Tree, { Path } from "./ptree"
+import Tree, { Path, create } from "./ptree"
 import connect from "./react/connect"
 
 export { Tree }
 export { connect }
 
 export default class Store {
-  constructor(initialState) {
+  constructor(initialState = {}) {
     this.tree = new Tree(initialState)
+  }
+
+  set(state) {
+    if (state.constructor === Promise) {
+      state.then(value => {
+        this.tree.root = create(this.tree, Path.root, value)
+        this.tree.pubsub.publish(Path.root, this.tree.root)
+      })
+    } else {
+      this.tree.root = create(this.tree, Path.root, state)
+      this.tree.pubsub.publish(Path.root, this.tree.root)
+    }
   }
 
   subscribe(path, subscriber) {

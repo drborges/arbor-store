@@ -1,6 +1,6 @@
 import Tree from "./tree"
-import Node from "./node"
 import Path from "./path"
+import Node, { create } from "./node"
 
 export default Tree
-export { Node, Path }
+export { Node, Path, create }
