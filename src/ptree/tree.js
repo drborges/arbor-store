@@ -20,11 +20,6 @@ export default class Tree {
   }
 
   subscribe(path, subscriber) {
-    if (arguments.length === 1) {
-      path = Path.root
-      subscriber = arguments[0]
-    }
-
     return this.pubsub.subscribe(path, subscriber)
   }
 }

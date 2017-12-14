@@ -1,4 +1,4 @@
-import Tree from "./ptree"
+import Tree, { Path } from "./ptree"
 import connect from "./react/connect"
 
 export { Tree }
@@ -10,6 +10,11 @@ export default class Store {
   }
 
   subscribe(path, subscriber) {
+    if (arguments.length === 1) {
+      path = Path.root
+      subscriber = arguments[0]
+    }
+
     return this.tree.subscribe(path, subscriber)
   }
 
