@@ -9,9 +9,7 @@ export default function connect(store) {
 
       componentDidMount() {
         super.componentDidMount && super.componentDidMount()
-        this.unsubscribe = store.subscribe(state => {
-          this.setState(state, () => { this.state = state })
-        })
+        this.unsubscribe = store.subscribe(state => this.setState(state))
       }
 
       componentWillUnmount() {
