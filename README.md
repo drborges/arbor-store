@@ -17,17 +17,15 @@ import Store, { connect } from "arbor"
 class CounterApp extends React.Component {
   render() {
     <div>
-      <button onClick={() => this.state.counter.count--}>{'-'}</button>
-      {this.state.counter.count}
-      <button onClick={() => this.state.counter.count++}>{'+'}</button>
+      <button onClick={() => this.state.count--}>{'-'}</button>
+      {this.state.count}
+      <button onClick={() => this.state.count++}>{'+'}</button>
     </div>
   }
 }
 
 const store = new Store({
-  counter: {
-    count: 0,
-  }
+  count: 0,
 })
 
 export default connect(store)(CounterApp)
