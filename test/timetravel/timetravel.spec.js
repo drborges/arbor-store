@@ -214,5 +214,24 @@ describe("#timeline", () => {
       expect(store.timeline.isOn).to.eq(false)
       expect(store.timeline.isOff).to.eq(true)
     })
+
+    it("one can still travel through time when timetravel is off", () => {
+      const store = new StoreWithTimetravel({
+        user: {
+          name: "Diego",
+          age: 32,
+        }
+      })
+
+      store.timeline.on()
+
+      store.state.user.name = "Bianca"
+
+      store.timeline.off()
+
+      store.timeline.travel.origin()
+
+      expect(store.state.user.name).to.eq("Diego")
+    })
   })
 })
