@@ -33,7 +33,9 @@ export default connect(store)(CounterApp)
 
 # Mutation Subscriptions
 
-```jsx
+Given the following store:
+
+```js
 const store = new Store({
   users: [],
   board: {
@@ -42,16 +44,28 @@ const store = new Store({
     done: [],
   },
 })
+```
 
-store.subscribe("/users", (users) => console.log("users list changed!", users))
+One may subscribe to state changes as such:
 
-store.subscribe("/users/push", (users) => console.log("New user added to array", user, users))
+```js
+store.subscribe((state) => console.log("New state:", state))
+```
 
-store.subscribe("/users/splice", (users, args) => console.log("Users list was spliced with", args))
-// args => [0, 1, [{ name: "New user" }]]
-// users => [{ name: "New user" }]
+Additionally, subscription to specific Store `Path` mutations are supported:
 
-store.subscribe("/board", (board) => console.log("TODO board was changed!", board))
+```js
+store.subscribe("/users", (users) => {
+  console.log("users list changed!", users)
+})
+
+store.subscribe("/users/push", (users, args) => {
+  console.log("New user added to array", users, args)
+})
+
+store.subscribe("/board/todos/:index", (todo, index) => {
+  console.log(`Todo ${index} was updated:`, todo)
+})
 ```
 
 # State Tree Time Travel
