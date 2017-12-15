@@ -1,33 +1,53 @@
 import React from "react"
 import sinon from "sinon"
 import { expect } from "chai"
-import { shallow } from "enzyme"
+import { mount } from "enzyme"
 
 import Store from "../../src"
 import connect from "../../src/react/connect"
 
-describe("connect", () => {
-  class Counter extends React.Component {
-    render() {
-      return (
-        <span>{this.state.count}</span>
-      )
-    }
+describe.only("connect", () => {
+  const Counter = ({ counter }) => {
+    return (
+      <div>
+        <span>{counter.count}</span>
+        <button onClick={() => counter.count++} />
+      </div>
+    )
   }
 
   it("subscribes a React component to store mutations", () => {
-    const store = new Store({ count: 0 })
+    const store = new Store({ counter: { count: 0 } })
     const CounterApp = connect(store)(Counter)
 
-    const wrapper = shallow(<CounterApp />)
+    const wrapper = mount(<CounterApp />)
 
-    store.state.count++
+    store.state.counter.count++
 
     wrapper.update()
 
     expect(wrapper.find("span")).to.have.text("1")
 
-    store.state.count++
+    store.state.counter.count++
+
+    wrapper.update()
+
+    expect(wrapper.find("span")).to.have.text("2")
+  })
+
+  it("can mutate state from within a stateless component", () => {
+    const store = new Store({ counter: { count: 0 } })
+    const CounterApp = connect(store)(Counter)
+
+    const wrapper = mount(<CounterApp />)
+
+    wrapper.find("button").props().onClick()
+
+    wrapper.update()
+
+    expect(wrapper.find("span")).to.have.text("1")
+
+    wrapper.find("button").props().onClick()
 
     wrapper.update()
 
@@ -35,10 +55,10 @@ describe("connect", () => {
   })
 
   it("unsubscribes a React component from store mutations", () => {
-    const store = new Store({ count: 0 })
+    const store = new Store({ counter: { count: 0 } })
     const CounterApp = connect(store)(Counter)
 
-    const wrapper = shallow(<CounterApp />)
+    const wrapper = mount(<CounterApp />)
 
     expect(store.tree.pubsub.subscriptions["/"]).to.not.be.empty
 
