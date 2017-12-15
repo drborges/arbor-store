@@ -6,7 +6,7 @@ import { mount } from "enzyme"
 import Store from "../../src"
 import connect from "../../src/react/connect"
 
-describe.only("connect", () => {
+describe("connect", () => {
   const Counter = ({ counter }) => {
     return (
       <div>
