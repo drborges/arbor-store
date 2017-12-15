@@ -1,5 +1,5 @@
 import Tree from "./tree"
-import Path from "./path"
 
+export Path from "./path"
+export Model from "./model"
 export default Tree
-export { Path }
