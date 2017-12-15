@@ -49,14 +49,7 @@ export default class Timeline {
 
   get travel() {
     const timeline = this
-    const noopAPI = {
-      step() {},
-      to() {},
-      origin() {},
-      present() {},
-    }
-
-    return !this.unsubscribe ? noopAPI : {
+    return {
       step(n = 0) {
         const prevCursor = this.cursor
         timeline.cursor += n
