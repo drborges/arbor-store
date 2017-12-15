@@ -14,18 +14,19 @@ A simple Counter APP...
 import React from "react"
 import Store, { connect } from "arbor"
 
-class CounterApp extends React.Component {
-  render() {
+const CounterApp = ({ counter }) => {
+  return (
     <div>
-      <button onClick={() => this.state.count--}>{'-'}</button>
-      {this.state.count}
-      <button onClick={() => this.state.count++}>{'+'}</button>
+      <span>{counter.count}</span>
+      <button onClick={() => counter.count++} />
     </div>
-  }
+  )
 }
 
 const store = new Store({
-  count: 0,
+  counter: {
+    count: 0,
+  }
 })
 
 export default connect(store)(CounterApp)
