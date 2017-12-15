@@ -66,4 +66,11 @@ describe("connect", () => {
 
     expect(store.tree.pubsub.subscriptions["/"]).to.be.empty
   })
+
+  it("provides a human-friendly displayName to the connected component", () => {
+    const store = new Store({ counter: { count: 0 } })
+    const CounterApp = connect(store)(Counter)
+
+    expect(CounterApp.displayName).to.eq("Connect(Counter)")
+  })
 })

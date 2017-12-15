@@ -5,6 +5,8 @@ export default function connect(store) {
     return class extends React.Component {
       state = store.state
 
+      static displayName = `Connect(${Target.displayName || Target.name})`
+
       componentDidMount() {
         super.componentDidMount && super.componentDidMount()
         this.unsubscribe = store.subscribe("/", (state) => {
