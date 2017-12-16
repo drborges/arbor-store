@@ -2,6 +2,11 @@ import create from "./create"
 import mutations from "../mutations"
 
 const isMutationMethod = (prop) => Object.keys(mutations).includes(prop)
+const isLeafNode = (value) =>
+  value === undefined ||
+  value === null ||
+  value.constructor !== Object &&
+  value.constructor !== Array
 
 export default class Node {
   constructor($tree, $path, value, $children = {}) {
@@ -12,25 +17,15 @@ export default class Node {
   }
 
   get(target, prop) {
-    if (this.hasOwnProperty(prop)) {
-      return isMutationMethod(prop) ?
-        this[prop](this.$path.child(prop)) :
-        this[prop]
-    }
-
-    if (target[prop] === undefined) {
-      return undefined
-    }
-
-    if (target[prop] === null) {
-      return null
-    }
-
-    const childPath = this.$path.child(prop)
     const value = target[prop]
+    const childPath = this.$path.child(prop)
 
-    if (value.constructor !== Object && value.constructor !== Array) {
-      return target[prop]
+    if (this[prop]) {
+      return isMutationMethod(prop) ? this[prop](childPath) : this[prop]
+    }
+
+    if (isLeafNode(value)) {
+      return value
     }
 
     if (!this.$children[prop]) {
