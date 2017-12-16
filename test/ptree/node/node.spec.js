@@ -1,7 +1,7 @@
 import sinon from "sinon"
 import { expect } from "chai"
 
-import Tree from "../../src/ptree"
+import Tree from "../../../src/ptree"
 
 describe("Node", () => {
   describe("#get", () => {
