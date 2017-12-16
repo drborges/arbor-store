@@ -150,7 +150,8 @@ describe("NodeArray", () => {
           { title: "nice!" },
           { title: "sweet!" },
           { title: "hell yeah!" },
-      ]}
+        ]
+      }
 
       const tree = new Tree(value)
 

@@ -3,10 +3,6 @@ const set = (value) => (node, prop) => {
   delete node.$children[prop]
 }
 
-const push = (item) => (node) => {
-  node.$value.push(item)
-}
-
 const splice = (start, removeCount, newItems) => (node) => {
   node.$value.splice(start, removeCount, ...newItems)
 
@@ -18,6 +14,5 @@ const splice = (start, removeCount, newItems) => (node) => {
 
 export default {
   set,
-  push,
   splice,
 }
