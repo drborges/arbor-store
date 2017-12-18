@@ -540,4 +540,105 @@ describe("NodeArray", () => {
       expect(tree.root.users[1].$path.toString()).to.eq("/users/1")
     })
   })
+
+  describe("#unshift", () => {
+    it("unshifts the items in a NodeArray appending new ones to the sequence", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+        ]
+      })
+
+      const newLength = tree.root.users.unshift(
+        { name: "Bianca" },
+        { name: "Pacheco" },
+      )
+
+      expect(newLength).to.eq(5)
+      expect(tree.root.users).to.deep.eq([
+        { name: "Bianca" },
+        { name: "Pacheco" },
+        { name: "Diego" },
+        { name: "Rocha" },
+        { name: "Borges" },
+      ])
+    })
+
+    it("wraps new elements within arbor proxies", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+        ]
+      })
+
+      tree.root.users.unshift(
+        { name: "Bianca" },
+        { name: "Pacheco" },
+      )
+
+      expect(tree.root.users.every(user => user.constructor.name === "NodeObject")).to.eq(true)
+    })
+
+    it("does not mutate original NodeArray", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+        ]
+      })
+
+      const originalUsers = tree.root.users
+
+      tree.root.users.unshift(
+        { name: "Bianca" },
+        { name: "Pacheco" },
+      )
+
+      expect(originalUsers).to.deep.eq([
+        { name: "Diego" },
+        { name: "Rocha" },
+        { name: "Borges" },
+      ])
+
+      expect(originalUsers.$value).to.deep.eq([
+        { name: "Diego" },
+        { name: "Rocha" },
+        { name: "Borges" },
+      ])
+    })
+
+    it("keep nodes' $paths up-to-date", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+        ]
+      })
+
+      const first = tree.root.users[0]
+      const second = tree.root.users[1]
+      const thirt = tree.root.users[2]
+
+      tree.root.users.unshift(
+        { name: "Bianca" },
+        { name: "Pacheco" },
+      )
+
+      expect(first.$path.toString()).to.eq("/users/0")
+      expect(second.$path.toString()).to.eq("/users/1")
+      expect(thirt.$path.toString()).to.eq("/users/2")
+
+      expect(tree.root.users[0].$path.toString()).to.eq("/users/0")
+      expect(tree.root.users[1].$path.toString()).to.eq("/users/1")
+      expect(tree.root.users[2].$path.toString()).to.eq("/users/2")
+      expect(tree.root.users[3].$path.toString()).to.eq("/users/3")
+      expect(tree.root.users[4].$path.toString()).to.eq("/users/4")
+    })
+  })
 })

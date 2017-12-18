@@ -35,6 +35,11 @@ export default class NodeArray extends Node {
     return shifted
   }
 
+  unshift = (path) => (...items) => {
+    this.$tree.mutate(path, mutations.unshift(items))
+    return this.$tree.get(path.parent).$value.length
+  }
+
   copy = () => create(
     this.$tree,
     this.$path,

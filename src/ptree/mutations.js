@@ -1,3 +1,14 @@
+/*
+ * Mutation operations are always applied to new copies of the affected node and
+ * they have two important responsibilities:
+ *
+ * 1. Mutate $value (underlying proxied value): Mutate the node's $value into
+ * the desired state
+ * 2. Refresh $children: Only refresh affected entries in node.$children with
+ * new Node instances. This leverages Structural Sharing for optimal performance
+ */
+
+
 const set = (value) => (node, prop) => {
   node.$value[prop] = value
   delete node.$children[prop]
@@ -40,6 +51,11 @@ const shift = () => (node) => {
   node.$value.shift()
 }
 
+const unshift = (items) => (node) => {
+  node.$children = []
+  node.$value.unshift(...items)
+}
+
 export default {
   copyWithin,
   reverse,
@@ -47,4 +63,5 @@ export default {
   shift,
   sort,
   splice,
+  unshift,
 }
