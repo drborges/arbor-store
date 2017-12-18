@@ -163,4 +163,95 @@ describe("NodeArray", () => {
       expect(tree.root.posts[1]).to.deep.eq({ title: "hell yeah!" })
     })
   })
+
+  describe("#sort", () => {
+    const value = {
+      users: [
+        { age: 21 },
+        { age: 35 },
+        { age: 30 },
+        { age: 40 },
+      ]
+    }
+
+    it("sorts NodeArray leaving children that did not change positions alone", () => {
+      const tree = new Tree(value)
+      const users = tree.root.users
+      const user0 = users[0]
+      const user1 = users[1]
+      const user2 = users[2]
+      const user3 = users[3]
+
+      const sorted = tree.root.users.sort((user1, user2) => user1.age - user2.age)
+
+      expect(sorted.every(user => user.constructor.name === "NodeObject"))
+      expect(sorted).to.eq(tree.root.users)
+      expect(sorted).to.not.eq(users)
+      expect(sorted).to.deep.eq([
+        { age: 21 },
+        { age: 30 },
+        { age: 35 },
+        { age: 40 },
+      ])
+
+      expect(user0).to.eq(sorted[0])
+      expect(user1).to.not.eq(sorted[1])
+      expect(user2).to.not.eq(sorted[2])
+      expect(user3).to.eq(sorted[3])
+    })
+
+    it("keeps NodeArray#$value sorted as well", () => {
+      const tree = new Tree(value)
+      const users = tree.root.users
+
+      const sorted = tree.root.users.sort((user1, user2) => user1.age - user2.age)
+
+      expect(sorted.$value).to.deep.eq([
+        { age: 21 },
+        { age: 30 },
+        { age: 35 },
+        { age: 40 },
+      ])
+    })
+
+    it("does not mutate original NodeArray", () => {
+      const tree = new Tree(value)
+      const users = tree.root.users
+
+      tree.root.users.sort((user1, user2) => user1.age - user2.age)
+
+      expect(users).to.deep.eq([
+        { age: 21 },
+        { age: 35 },
+        { age: 30 },
+        { age: 40 },
+      ])
+    })
+
+    it("keep nodes' $paths up-to-date", () => {
+      const tree = new Tree({
+        users: [
+          { age: 21 },
+          { age: 35, posts: [{ text: "Nice" }] },
+          { age: 30, posts: [{ text: "Nice" }] },
+          { age: 40 },
+        ]
+      })
+
+      const user1Posts = tree.root.users[1].posts
+      const user2Posts = tree.root.users[2].posts
+
+      const sorted = tree.root.users.sort((user1, user2) => user1.age - user2.age)
+
+      expect(user1Posts.$path.toString()).to.eq("/users/1/posts")
+      expect(user2Posts.$path.toString()).to.eq("/users/2/posts")
+
+      expect(sorted[0].$path.toString()).to.eq("/users/0")
+      expect(sorted[1].$path.toString()).to.eq("/users/1")
+      expect(sorted[1].posts.$path.toString()).to.eq("/users/1/posts")
+      expect(sorted[2].$path.toString()).to.eq("/users/2")
+      expect(sorted[2].posts.$path.toString()).to.eq("/users/2/posts")
+      expect(sorted[3].$path.toString()).to.eq("/users/3")
+    })
+  })
 })

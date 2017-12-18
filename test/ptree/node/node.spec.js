@@ -35,4 +35,30 @@ describe("Node", () => {
       expect(tree.root.data).to.eq(null)
     })
   })
+
+  describe("#set", () => {
+    it("allows setting $children prop", () => {
+      const tree = new Tree({
+        user: { name: "Diego" }
+      })
+
+      expect(tree.root.user.$children).to.deep.eq({})
+
+      tree.root.user.$children = { child: "fake child" }
+
+      expect(tree.root.user.$children).to.deep.eq({ child: "fake child" })
+    })
+
+    it("allows setting $value prop", () => {
+      const tree = new Tree({
+        user: { name: "Diego" }
+      })
+
+      expect(tree.root.user.$value).to.deep.eq({ name: "Diego" })
+
+      tree.root.user.$value = { child: "fake child" }
+
+      expect(tree.root.user.$value).to.deep.eq({ child: "fake child" })
+    })
+  })
 })

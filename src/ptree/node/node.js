@@ -36,9 +36,18 @@ export default class Node {
   }
 
   set(target, prop, value) {
+    if (prop === "$value" || prop === "$children") {
+      this[prop] = value
+      return true
+    }
+
     const path = this.$path.child(prop)
     this.$tree.mutate(path, mutations.set(value))
 
     return true
+  }
+
+  createChild(prop, value) {
+    return this.$children[prop] = create(this.$tree, this.$path.child(prop), value)
   }
 }

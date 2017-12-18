@@ -12,7 +12,16 @@ const splice = (start, removeCount, newItems) => (node) => {
   }
 }
 
+const sort = (compare) => (node) => {
+  node.$children = node.$value.sort(compare).map((item, i) => {
+    return (node[i].$value === item) ?
+      node[i] :
+      node.createChild(i, item)
+  })
+}
+
 export default {
   set,
+  sort,
   splice,
 }

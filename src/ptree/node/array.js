@@ -14,6 +14,11 @@ export default class NodeArray extends Node {
     return removed
   }
 
+  sort = (path) => (compare) => {
+    this.$tree.mutate(path, mutations.sort(compare))
+    return this.$tree.get(path.parent)
+  }
+
   copy = () => create(
     this.$tree,
     this.$path,
