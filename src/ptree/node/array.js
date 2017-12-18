@@ -19,6 +19,11 @@ export default class NodeArray extends Node {
     return this.$tree.get(path.parent)
   }
 
+  copyWithin = (path) => (target, start, end) => {
+    this.$tree.mutate(path, mutations.copyWithin(target, start, end))
+    return this.$tree.get(path.parent)
+  }
+
   copy = () => create(
     this.$tree,
     this.$path,

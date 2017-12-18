@@ -20,7 +20,15 @@ const sort = (compare) => (node) => {
   })
 }
 
+const copyWithin = (target, start, end) => (node) => {
+  node.$value.copyWithin(target, start, end)
+  for (let i = target; i <= end; i++) {
+    delete node.$children[i]
+  }
+}
+
 export default {
+  copyWithin,
   set,
   sort,
   splice,

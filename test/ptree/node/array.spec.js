@@ -254,4 +254,69 @@ describe("NodeArray", () => {
       expect(sorted[3].$path.toString()).to.eq("/users/3")
     })
   })
+
+  describe("#copyWithin", () => {
+    it("copies NodeArray items within the NodeArray itself", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+          { name: "drborges" },
+        ]
+      })
+
+      expect(tree.root.users.copyWithin(1, 0, 2)).to.deep.eq([
+        { name: "Diego" },
+        { name: "Diego" },
+        { name: "Rocha" },
+        { name: "drborges" },
+      ])
+    })
+
+    it("does not mutate original NodeArray", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+          { name: "drborges" },
+        ]
+      })
+
+      const originalUsers = tree.root.users
+
+      tree.root.users.copyWithin(1, 0, 2)
+
+      expect(originalUsers).to.deep.eq([
+        { name: "Diego" },
+        { name: "Rocha" },
+        { name: "Borges" },
+        { name: "drborges" },
+      ])
+    })
+
+    it("reuses items not affected by the mutation", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+          { name: "drborges" },
+        ]
+      })
+
+      const diego = tree.root.users[0]
+      const rocha = tree.root.users[1]
+      const borges = tree.root.users[2]
+      const drborges = tree.root.users[3]
+
+      tree.root.users.copyWithin(1, 0, 2)
+
+      expect(tree.root.users[0]).to.eq(diego)
+      expect(tree.root.users[1]).to.not.eq(rocha)
+      expect(tree.root.users[2]).to.not.eq(borges)
+      expect(tree.root.users[3]).to.eq(drborges)
+    })
+  })
 })
