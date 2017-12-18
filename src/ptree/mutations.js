@@ -35,10 +35,16 @@ const reverse = () => (node) => {
   })
 }
 
+const shift = () => (node) => {
+  node.$children = []
+  node.$value.shift()
+}
+
 export default {
   copyWithin,
   reverse,
   set,
+  shift,
   sort,
   splice,
 }

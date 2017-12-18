@@ -457,4 +457,87 @@ describe("NodeArray", () => {
       expect(tree.root.users[2]).to.not.eq(borges)
     })
   })
+
+  describe("#shift", () => {
+    it("shifts the items in a NodeArray", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+        ]
+      })
+
+      const shifted = tree.root.users.shift()
+
+      expect(shifted).to.deep.eq({ name: "Diego" })
+      expect(tree.root.users).to.deep.eq([
+        { name: "Rocha" },
+        { name: "Borges" },
+      ])
+    })
+
+    it("shifted elements are no longer arbor proxies", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+        ]
+      })
+
+      const shifted = tree.root.users.shift()
+
+      expect(shifted.constructor.name).to.not.eq("NodeObject")
+    })
+
+    it("does not mutate original NodeArray", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+        ]
+      })
+
+      const originalUsers = tree.root.users
+
+      tree.root.users.shift()
+
+      expect(originalUsers).to.deep.eq([
+        { name: "Diego" },
+        { name: "Rocha" },
+        { name: "Borges" },
+      ])
+
+      expect(originalUsers.$value).to.deep.eq([
+        { name: "Diego" },
+        { name: "Rocha" },
+        { name: "Borges" },
+      ])
+    })
+
+    it("keep nodes' $paths up-to-date", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+        ]
+      })
+
+      const first = tree.root.users[0]
+      const second = tree.root.users[1]
+      const thirt = tree.root.users[2]
+
+      tree.root.users.shift()
+
+      expect(first.$path.toString()).to.eq("/users/0")
+      expect(second.$path.toString()).to.eq("/users/1")
+      expect(thirt.$path.toString()).to.eq("/users/2")
+
+      expect(tree.root.users[0].$path.toString()).to.eq("/users/0")
+      expect(tree.root.users[1].$path.toString()).to.eq("/users/1")
+    })
+  })
 })
