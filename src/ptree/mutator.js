@@ -6,7 +6,7 @@ class Mutator {
   }
 
   apply(mutation, mutationPath, parent) {
-    const childPath = mutationPath.subpath(parent.$path.depth)
+    const childPath = mutationPath.subpath(parent.$path.depth + 1)
     const childProp = childPath.leaf
     const child = parent.$children[childProp]
 

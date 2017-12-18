@@ -37,7 +37,15 @@ export default class Path {
   }
 
   subpath(depth = 0) {
-    return new Path(...this.nodes.slice(0, depth+1))
+    if (depth < 0) {
+      return undefined
+    }
+
+    return new Path(...this.nodes.slice(0, depth))
+  }
+
+  get parent() {
+    return this.subpath(this.depth - 1)
   }
 
   get leaf() {

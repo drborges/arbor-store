@@ -120,13 +120,17 @@ describe("Path", () => {
   describe("#subpath", () => {
     it("retrieves subpaths from a given path", () => {
       const path = new Path("users", 0, "name")
+      const undefinedPath = path.subpath(-1)
       const depth0Path = path.subpath(0)
       const depth1Path = path.subpath(1)
       const depth2Path = path.subpath(2)
+      const depth3Path = path.subpath(3)
 
-      expect(depth0Path.toString()).to.eq("/users")
-      expect(depth1Path.toString()).to.eq("/users/0")
-      expect(depth2Path.toString()).to.eq("/users/0/name")
+      expect(undefinedPath).to.be.undefined
+      expect(depth0Path.toString()).to.eq("/")
+      expect(depth1Path.toString()).to.eq("/users")
+      expect(depth2Path.toString()).to.eq("/users/0")
+      expect(depth3Path.toString()).to.eq("/users/0/name")
     })
   })
 
@@ -145,6 +149,15 @@ describe("Path", () => {
       expect(Path.parse("/users").depth).to.eq(1)
       expect(Path.parse("/users/0").depth).to.eq(2)
       expect(Path.parse("/users/0/name").depth).to.eq(3)
+    })
+  })
+
+  describe("#parent", () => {
+    it("computes the parent path of a given path", () => {
+      expect(Path.parse("/").parent).to.be.undefined
+      expect(Path.parse("/users").parent.toString()).to.eq("/")
+      expect(Path.parse("/users/0").parent.toString()).to.eq("/users")
+      expect(Path.parse("/users/0/name").parent.toString()).to.eq("/users/0")
     })
   })
 })
