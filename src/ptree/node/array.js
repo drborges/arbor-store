@@ -24,6 +24,11 @@ export default class NodeArray extends Node {
     return this.$tree.get(path.parent)
   }
 
+  reverse = (path) => () => {
+    this.$tree.mutate(path, mutations.reverse())
+    return this.$tree.get(path.parent)
+  }
+
   copy = () => create(
     this.$tree,
     this.$path,

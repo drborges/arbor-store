@@ -27,8 +27,17 @@ const copyWithin = (target, start, end) => (node) => {
   }
 }
 
+const reverse = () => (node) => {
+  node.$children = node.$value.reverse().map((item, i) => {
+    return (node[i].$value === item) ?
+      node[i] :
+      node.createChild(i, item)
+  })
+}
+
 export default {
   copyWithin,
+  reverse,
   set,
   sort,
   splice,

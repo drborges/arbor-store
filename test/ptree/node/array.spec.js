@@ -319,4 +319,85 @@ describe("NodeArray", () => {
       expect(tree.root.users[3]).to.eq(drborges)
     })
   })
+
+  describe("#reverse", () => {
+    it("reverses the sequence of items in a NodeArray", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+        ]
+      })
+
+      const reversed = tree.root.users.reverse()
+
+      expect(reversed).to.deep.eq([
+        { name: "Borges" },
+        { name: "Rocha" },
+        { name: "Diego" },
+      ])
+    })
+
+    it("wraps reversed elements within arbor proxies", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+        ]
+      })
+
+      const reversed = tree.root.users.reverse()
+
+      expect(reversed.constructor.name).to.eq("NodeArray")
+      expect(reversed.every(user => user.constructor.name === "NodeObject"))
+    })
+
+    it("does not mutate original NodeArray", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+        ]
+      })
+
+      const originalUsers = tree.root.users
+
+      tree.root.users.reverse()
+
+      expect(originalUsers).to.deep.eq([
+        { name: "Diego" },
+        { name: "Rocha" },
+        { name: "Borges" },
+      ])
+
+      expect(originalUsers.$value).to.deep.eq([
+        { name: "Diego" },
+        { name: "Rocha" },
+        { name: "Borges" },
+      ])
+    })
+
+    it("reuses items not affected by the mutation", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+        ]
+      })
+
+      const diego = tree.root.users[0]
+      const rocha = tree.root.users[1]
+      const borges = tree.root.users[2]
+
+      tree.root.users.reverse()
+
+      expect(tree.root.users[0]).to.not.eq(diego)
+      expect(tree.root.users[1]).to.eq(rocha)
+      expect(tree.root.users[2]).to.not.eq(borges)
+    })
+  })
 })
