@@ -111,15 +111,14 @@ describe("NodeArray", () => {
 
   describe("#splice", () => {
     it("removes and adds elements to the tree", () => {
-      const value = {
+      const tree = new Tree({
         posts: [
           { title: "nice!" },
           { title: "sweet!" },
-          { title: "hell yeah!",
-        }
-      ]}
+          { title: "hell yeah!" }
+        ]
+      })
 
-      const tree = new Tree(value)
       const root = tree.root
       const posts = tree.root.posts
 
@@ -145,15 +144,13 @@ describe("NodeArray", () => {
     })
 
     it("deletes all children proxies from parent's cache that were affected by the splice", () => {
-      const value = {
+      const tree = new Tree({
         posts: [
           { title: "nice!" },
           { title: "sweet!" },
-          { title: "hell yeah!" },
+          { title: "hell yeah!" }
         ]
-      }
-
-      const tree = new Tree(value)
+      })
 
       expect(tree.root.posts[0]).to.deep.eq({ title: "nice!" })
       expect(tree.root.posts[1]).to.deep.eq({ title: "sweet!" })
@@ -162,20 +159,33 @@ describe("NodeArray", () => {
 
       expect(tree.root.posts[1]).to.deep.eq({ title: "hell yeah!" })
     })
+
+    it("wraps elements within arbor proxies", () => {
+      const tree = new Tree({
+        posts: [
+          { title: "nice!" },
+          { title: "sweet!" },
+          { title: "hell yeah!" }
+        ]
+      })
+
+      const removed = tree.root.posts.splice(0, 2, { title: "Oh boy!" })
+
+      expect(removed.every(user => user.constructor.name !== "NodeObject")).to.eq(true)
+    })
   })
 
   describe("#sort", () => {
-    const value = {
-      users: [
-        { age: 21 },
-        { age: 35 },
-        { age: 30 },
-        { age: 40 },
-      ]
-    }
-
     it("sorts NodeArray leaving children that did not change positions alone", () => {
-      const tree = new Tree(value)
+      const tree = new Tree({
+        users: [
+          { age: 21 },
+          { age: 35 },
+          { age: 30 },
+          { age: 40 },
+        ]
+      })
+
       const users = tree.root.users
       const user0 = users[0]
       const user1 = users[1]
@@ -184,7 +194,6 @@ describe("NodeArray", () => {
 
       const sorted = tree.root.users.sort((user1, user2) => user1.age - user2.age)
 
-      expect(sorted.every(user => user.constructor.name === "NodeObject"))
       expect(sorted).to.eq(tree.root.users)
       expect(sorted).to.not.eq(users)
       expect(sorted).to.deep.eq([
@@ -200,8 +209,32 @@ describe("NodeArray", () => {
       expect(user3).to.eq(sorted[3])
     })
 
+    it("wraps elements within arbor proxies", () => {
+      const tree = new Tree({
+        users: [
+          { age: 21 },
+          { age: 35 },
+          { age: 30 },
+          { age: 40 },
+        ]
+      })
+
+      const sorted = tree.root.users.sort((user1, user2) => user1.age - user2.age)
+
+      expect(sorted.constructor.name).to.eq("NodeArray")
+      expect(sorted.every(user => user.constructor.name === "NodeObject")).to.eq(true)
+    })
+
     it("keeps NodeArray#$value sorted as well", () => {
-      const tree = new Tree(value)
+      const tree = new Tree({
+        users: [
+          { age: 21 },
+          { age: 35 },
+          { age: 30 },
+          { age: 40 },
+        ]
+      })
+
       const users = tree.root.users
 
       const sorted = tree.root.users.sort((user1, user2) => user1.age - user2.age)
@@ -215,7 +248,15 @@ describe("NodeArray", () => {
     })
 
     it("does not mutate original NodeArray", () => {
-      const tree = new Tree(value)
+      const tree = new Tree({
+        users: [
+          { age: 21 },
+          { age: 35 },
+          { age: 30 },
+          { age: 40 },
+        ]
+      })
+
       const users = tree.root.users
 
       tree.root.users.sort((user1, user2) => user1.age - user2.age)
@@ -272,6 +313,22 @@ describe("NodeArray", () => {
         { name: "Rocha" },
         { name: "drborges" },
       ])
+    })
+
+    it("wraps elements within arbor proxies", () => {
+      const tree = new Tree({
+        users: [
+          { name: "Diego" },
+          { name: "Rocha" },
+          { name: "Borges" },
+          { name: "drborges" },
+        ]
+      })
+
+      const copied = tree.root.users.copyWithin(1, 0, 2)
+
+      expect(copied.constructor.name).to.eq("NodeArray")
+      expect(copied.every(user => user.constructor.name === "NodeObject")).to.eq(true)
     })
 
     it("does not mutate original NodeArray", () => {
@@ -351,7 +408,7 @@ describe("NodeArray", () => {
       const reversed = tree.root.users.reverse()
 
       expect(reversed.constructor.name).to.eq("NodeArray")
-      expect(reversed.every(user => user.constructor.name === "NodeObject"))
+      expect(reversed.every(user => user.constructor.name === "NodeObject")).to.eq(true)
     })
 
     it("does not mutate original NodeArray", () => {
