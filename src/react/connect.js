@@ -18,7 +18,7 @@ export default function connect(store) {
       }
 
       render() {
-        return <Target {...this.state} />
+        return <Target {...this.props} {...this.state} />
       }
     }
   }
