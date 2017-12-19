@@ -1,5 +1,6 @@
-import create from "./create"
 import Node from "./node"
+import NodeArray from "./array"
+import NodeObject from "./object"
 
-export { create }
+export { NodeObject, NodeArray }
 export default Node

@@ -1,4 +1,4 @@
-import { Path, create } from "../ptree"
+import { Path } from "../ptree"
 
 export default class Timeline {
   constructor(store) {
@@ -42,7 +42,7 @@ export default class Timeline {
     const state = this.history[this.cursor]
 
     this.off()
-    this.store.tree.root = create(this.store.tree, Path.root, state, state.$children)
+    this.store.tree.root = this.store.tree.create(Path.root, state, state.$children)
     this.store.tree.pubsub.publish(Path.root, state)
     this.on()
   }

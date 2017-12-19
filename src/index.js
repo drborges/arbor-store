@@ -16,11 +16,11 @@ export default class Store {
   set(state) {
     if (state.constructor === Promise) {
       state.then(value => {
-        this.tree.root = create(this.tree, Path.root, value)
+        this.tree.root = this.tree.create(Path.root, value)
         this.tree.pubsub.publish(Path.root, this.tree.root)
       })
     } else {
-      this.tree.root = create(this.tree, Path.root, state)
+      this.tree.root = this.tree.create(Path.root, state)
       this.tree.pubsub.publish(Path.root, this.tree.root)
     }
   }

@@ -1,4 +1,3 @@
-import create from "./create"
 import mutations from "../mutations"
 
 const isMutationMethod = (prop) => Object.keys(mutations).includes(prop)
@@ -29,7 +28,7 @@ export default class Node {
     }
 
     if (!this.$children[prop]) {
-      this.$children[prop] = create(this.$tree, childPath, value)
+      this.$children[prop] = this.$tree.create(childPath, value)
     }
 
     return this.$children[prop]
@@ -48,6 +47,6 @@ export default class Node {
   }
 
   createChild(prop, value) {
-    return this.$children[prop] = create(this.$tree, this.$path.child(prop), value)
+    return this.$children[prop] = this.$tree.create(this.$path.child(prop), value)
   }
 }

@@ -1,5 +1,4 @@
 import Node from "./node"
-import create from "./create"
 import mutations from "../mutations"
 
 export default class NodeArray extends Node {
@@ -40,8 +39,7 @@ export default class NodeArray extends Node {
     return this.$tree.get(path.parent).$value.length
   }
 
-  copy = () => create(
-    this.$tree,
+  copy = () => this.$tree.create(
     this.$path,
     [ ...this.$value ],
     { ...this.$children },
