@@ -1,6 +1,6 @@
 # Arbor
 
-State management made with ❤️.
+Seamless state management made with ❤️.
 
 # What is it?
 
