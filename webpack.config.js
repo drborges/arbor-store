@@ -1,9 +1,14 @@
 const path = require("path")
+const webpack = require("webpack")
+const CompressionPlugin = require("compression-webpack-plugin")
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+
+const env = process.env.NODE_ENV
+const prodBuild = env === 'production'
 
 module.exports = {
-  devtool: "eval-source-map",
+  devtool: !prodBuild ? "eval-source-map" : "",
   entry: [
-    "babel-polyfill",
     path.resolve("src", "index.js"),
   ],
   output: {
@@ -15,6 +20,20 @@ module.exports = {
   resolve: {
     extensions: [".js", ".jsx"]
   },
+  plugins: [
+    new BundleAnalyzerPlugin(),
+    new webpack.optimize.UglifyJsPlugin(),
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(env),
+    }),
+    new CompressionPlugin({
+      asset: "[path].gz[query]",
+      algorithm: "gzip",
+      test: /\.js$/,
+      threshold: 0,
+      minRatio: 0.8,
+    }),
+  ],
   module: {
     rules: [
       {
