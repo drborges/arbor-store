@@ -8,19 +8,37 @@ export default class NodeArray extends Node {
     return this.$proxy = new Proxy(value, this)
   }
 
-  push = (path) => (item) => {
-    this.$tree.mutate(path, mutations.push(item))
-  }
-
   splice = (path) => (start, removeCount, ...newItems) => {
     const removed = this.$value.slice(start, removeCount)
     this.$tree.mutate(path, mutations.splice(start, removeCount, newItems))
     return removed
   }
 
-  map = (fn) => this.$value.map((_, i) => {
-    return fn(this.get(this.$value, i), i, this.$proxy)
-  })
+  sort = (path) => (compare) => {
+    this.$tree.mutate(path, mutations.sort(compare))
+    return this.$tree.get(path.parent)
+  }
+
+  copyWithin = (path) => (target, start, end) => {
+    this.$tree.mutate(path, mutations.copyWithin(target, start, end))
+    return this.$tree.get(path.parent)
+  }
+
+  reverse = (path) => () => {
+    this.$tree.mutate(path, mutations.reverse())
+    return this.$tree.get(path.parent)
+  }
+
+  shift = (path) => () => {
+    const shifted = this.$value[0]
+    this.$tree.mutate(path, mutations.shift())
+    return shifted
+  }
+
+  unshift = (path) => (...items) => {
+    this.$tree.mutate(path, mutations.unshift(items))
+    return this.$tree.get(path.parent).$value.length
+  }
 
   copy = () => create(
     this.$tree,
