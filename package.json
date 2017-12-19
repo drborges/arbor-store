@@ -12,7 +12,15 @@
     "build:watch": "./node_modules/webpack/bin/webpack.js --config webpack.config.js --watch",
     "test": "mocha",
     "test:watch": "mocha -w",
-    "flow:watch": "flow-watch"
+    "flow:watch": "flow-watch",
+    "prepare": "yarn build",
+    "preversion": "yarn test",
+    "version": "yarn build",
+    "postversion": "git push && git push --tags",
+    "release-patch": "npm version patch -m",
+    "release-minor": "npm version minor -m",
+    "release-major": "npm version major -m",
+    "publish": "npm publish ./"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",
