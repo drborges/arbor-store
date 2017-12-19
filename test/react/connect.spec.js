@@ -73,4 +73,25 @@ describe("connect", () => {
 
     expect(CounterApp.displayName).to.eq("Connect(Counter)")
   })
+
+  it("forwards the props to the wrapped component", () => {
+    const store = new Store({ description: "foo" })
+    const App = (props) => (
+        <div>
+          <span>{props.description}</span>
+          <span>{props.name}</span>
+          <span>{props.number}</span>
+        </div>
+      )
+
+    const ConnectedApp = connect(store)(App)
+
+    const wrapper = mount(<ConnectedApp name={"bar"} number={10}/>)
+
+    expect(wrapper.find(App).props()).to.deep.equal({
+      description: "foo",
+      name: "bar",
+      number: 10,
+    })
+  })
 })
