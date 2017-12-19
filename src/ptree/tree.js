@@ -14,6 +14,11 @@ export default class Tree {
     return Path.resolve(path).traverse(this.root)
   }
 
+  setRoot(value) {
+    this.root = this.create(Path.root, value)
+    this.pubsub.publish(Path.root, this.root)
+  }
+
   mutate(path, mutation) {
     this.root = this.root.copy()
     this.mutator.apply(mutation, Path.resolve(path), this.root)
