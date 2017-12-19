@@ -7,7 +7,7 @@ export default class Tree {
   constructor(initialState) {
     this.root = this.create(Path.root, initialState)
     this.pubsub = new Pubsub
-    this.mutator = new Mutator(this)
+    this.mutator = new Mutator
   }
 
   get(path) {
@@ -21,7 +21,8 @@ export default class Tree {
 
   mutate(path, mutation) {
     this.root = this.root.copy()
-    this.mutator.apply(mutation, Path.resolve(path), this.root)
+    this.mutator.mutate(mutation, Path.resolve(path), this.root)
+    this.pubsub.publish(Path.root, this.root)
   }
 
   create(path, value, children = {}) {
