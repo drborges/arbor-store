@@ -4,10 +4,10 @@ import Mutator from "./mutator"
 import { NodeObject, NodeArray } from "./node"
 
 export default class Tree {
-  constructor(initialState) {
+  constructor(initialState, { pubsub = new Pubsub, mutator = new Mutator } = {}) {
     this.root = this.create(Path.root, initialState)
-    this.pubsub = new Pubsub
-    this.mutator = new Mutator
+    this.pubsub = pubsub
+    this.mutator = mutator
   }
 
   get(path) {
