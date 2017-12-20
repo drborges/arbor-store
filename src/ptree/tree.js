@@ -21,7 +21,7 @@ export default class Tree {
 
   mutate(path, mutation) {
     this.root = this.root.copy()
-    this.mutator.mutate(mutation, Path.resolve(path), this.root)
+    this.mutator.mutate(Path.resolve(path), mutation, this.root)
     this.pubsub.publish(Path.root, this.root)
   }
 
