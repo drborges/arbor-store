@@ -12,7 +12,7 @@ A simple Counter APP...
 
 ```jsx
 import React from "react"
-import Store, { connect } from "arbor"
+import Store, { connect } from "arbor-store"
 
 const CounterApp = ({ counter }) => {
   return (
@@ -156,7 +156,7 @@ The model above represents different lists of TODO entries.
 ### Connecting a React component to an arbor store
 
 ```jsxx
-import Store, { connect } from "arbor"
+import Store, { connect } from "arbor-store"
 
 class BoardView extends React.Component {
   render() {
