@@ -14,7 +14,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "lib"),
     filename: "index.js",
-    library: "arbor",
+    library: "arbor-store",
     libraryTarget: 'umd',
   },
   resolve: {

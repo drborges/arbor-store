@@ -1,5 +1,5 @@
 {
-  "name": "arbor",
+  "name": "arbor-store",
   "version": "0.1.1",
   "description": "Seamless state management made with <3",
   "author": "drborges <drborges.cic@gmail.com> (https://github.com/drborges)",
@@ -9,21 +9,22 @@
   "jsnext:main": "src/index.jsx",
   "repository": {
     "type": "git",
-    "url": "https://github.com/drborges/arbor.git"
+    "url": "https://github.com/drborges/arbor-store.git"
   },
   "keywords": [
     "arbor",
     "redux",
     "state",
+    "store",
     "functional",
     "immutable",
     "replay",
     "flux"
   ],
   "bugs": {
-    "url": "https://github.com/drborges/arbor/issues"
+    "url": "https://github.com/drborges/arbor-store/issues"
   },
-  "homepage": "https://github.com/drborges/arbor",
+  "homepage": "https://github.com/drborges/arbor-store",
   "scripts": {
     "build": "NODE_ENV=production ./node_modules/webpack/bin/webpack.js --config webpack.config.js",
     "build:watch": "./node_modules/webpack/bin/webpack.js --config webpack.config.js --watch",
