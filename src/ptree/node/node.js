@@ -28,20 +28,18 @@ export default class Node {
     }
 
     if (!this.$children[prop]) {
-      this.$children[prop] = this.$tree.create(childPath, value)
+      this.createChild(prop, value)
     }
 
     return this.$children[prop]
   }
 
   set(target, prop, value) {
-    if (prop === "$value" || prop === "$children") {
+    if (this[prop]) {
       this[prop] = value
-      return true
+    } else {
+      this.$tree.mutate(this.$path.child(prop), mutations.set(value))
     }
-
-    const path = this.$path.child(prop)
-    this.$tree.mutate(path, mutations.set(value))
 
     return true
   }

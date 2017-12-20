@@ -1,7 +1,7 @@
 import Path from "./path"
 
 class Mutator {
-  mutate(mutation, mutationPath, node) {
+  mutate(mutationPath, mutation, node) {
     const childPath = mutationPath.subpath(node.$path.depth + 1)
     const childProp = childPath.leaf
 
@@ -17,7 +17,7 @@ class Mutator {
       const refreshedChild = node.$children[childProp] = child.copy()
       // Make sure proxies are wrapping up-to-date data
       node.$value[childProp] = refreshedChild.$value
-      this.mutate(mutation, mutationPath, refreshedChild)
+      this.mutate(mutationPath, mutation, refreshedChild)
     }
   }
 }
