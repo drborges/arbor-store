@@ -4,9 +4,9 @@ Seamless state management made with ❤️.
 
 # What is it?
 
-# Getting Started
+This is work in progress, though, it's already pretty cool :)
 
-TODO...
+# Getting Started
 
 A simple Counter APP...
 
@@ -31,6 +31,13 @@ const store = new Store({
 
 export default connect(store)(CounterApp)
 ```
+
+Once an Arbor Store is connected to your React component, the store's state is
+passed via props to the connected component. Regular JS mutations can be applied
+to any non-primitive prop, under the hoods, Arbor uses proxies to ensure these
+mutations do not happen in-place and rather, in an immutable fashion through
+structural sharing, allowing React to re-render the UI in an optimal way. This
+process behavior is very similar to Redux reducers.
 
 # Mutation Subscriptions
 
@@ -71,7 +78,10 @@ store.subscribe("/board/todos/:index", (todo, index) => {
 
 # State Tree Time Travel
 
-TODO
+Arbor leverages Structural Sharing in order to perform state mutations. A new
+state tree is always created by applying the minimum amount of operations
+necessary to generate the new state. With this, a series of state snapshots may
+be recorded, allowing for interesting use cases such as [State Time Travel](https://drborges.github.io/arbor-react-app).
 
 ![2017-12-14 20 51 16](https://user-images.githubusercontent.com/508128/34018352-9d031a56-e110-11e7-9e3f-9f30a3c2e8ad.gif)
 
@@ -81,7 +91,7 @@ Model classes may be used to represent a path(s) within the State Tree. Take the
 
 See the [spike branch](https://github.com/drborges/arbor/tree/feature/arbor-model) for more insights...
 
-```jsx
+```js
 const store = new Store({
   users: [],
   board: {
@@ -96,7 +106,7 @@ store.bind(User, Board, Todo)
 
 A model class can then be created to represent a TODO `Board` by simple adding the decorator `@Model` with the path within the state tree containing the board data.
 
-```jsx
+```js
 @Model("/board")
 class Board {
   createTodo() {
@@ -119,7 +129,7 @@ Now whenever one access `store.board`, and instance of `Board` will be provided.
 
 A model class may be bound to multiple paths within the state tree as well:
 
-```jsx
+```js
 @Model(
   "/board/todos/:index",
   "/board/doing/:index",
@@ -138,7 +148,7 @@ class Todo {
 
 In order to implement a model that represents a list of nodes within the state tree, simply extend the `Array` class.
 
-```jsx
+```js
 @Model(
   "/board/todos",
   "/board/doing",
@@ -152,30 +162,3 @@ class TodoList extends Array {
 ```
 
 The model above represents different lists of TODO entries.
-
-### Connecting a React component to an arbor store
-
-```jsxx
-import Store, { connect } from "arbor-store"
-
-class BoardView extends React.Component {
-  render() {
-    return (
-      <Board onCreateTodo={this.state.board.createTodo}>
-        <Column title="Todos" data={this.state.board.todos} />
-        <Column title="Todos" data={this.state.board.doing} />
-        <Column title="Todos" data={this.state.board.done} />
-      </Board>
-    )
-  }
-}
-
-const store = new Store(...)
-export default connect(store)(BoardView)
-```
-
-Once an Arbor store is connected to your React container, you may interact with
-the component's `this.state` normally, mutations to the state instance variable
-are handled by arbor via proxies under the hoods so that they happen in an
-immutable fashion, just like Redux, allowing React to re-render the UI in an
-optimal way.
