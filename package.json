@@ -1,6 +1,6 @@
 {
   "name": "arbor-store",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Seamless state management made with <3",
   "author": "drborges <drborges.cic@gmail.com> (https://github.com/drborges)",
   "license": "MIT",
