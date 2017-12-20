@@ -37,7 +37,7 @@
     "release-patch": "npm version patch -m",
     "release-minor": "npm version minor -m",
     "release-major": "npm version major -m",
-    "publish": "npm publish ./"
+    "publish": "npm login && npm publish ./"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",
