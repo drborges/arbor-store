@@ -4,7 +4,7 @@ import mutations from "../mutations"
 export default class NodeArray extends Node {
   constructor($tree, $path, value, $children = {}) {
     super($tree, $path, value, $children)
-    return this.$proxy = new Proxy(value, this)
+    return new Proxy(value, this)
   }
 
   splice = (path) => (start, removeCount, ...newItems) => {

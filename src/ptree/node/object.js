@@ -3,7 +3,7 @@ import Node from "./node"
 export default class NodeObject extends Node {
   constructor($tree, $path, value, $children = {}) {
     super($tree, $path, value, $children)
-    return this.$proxy = new Proxy(value, this)
+    return new Proxy(value, this)
   }
 
   copy = () => this.$tree.create(
