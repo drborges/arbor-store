@@ -1,12 +1,12 @@
 import sinon from "sinon"
 import { expect } from "chai"
 
-import MTree, { Model } from "../../src/mtree"
+import MTree from "../../src/mtree"
 
 describe("MTree", () => {
   it("registers a custom node handler to a given path", () => {
 
-    const User = Model(class {})
+    class User {}
 
     const tree = new MTree({
       user: {
@@ -22,7 +22,6 @@ describe("MTree", () => {
 
   it("registers a custom node handler to a path with wildcard", () => {
 
-    @Model
     class Post {}
 
     const tree = new MTree({
@@ -47,7 +46,6 @@ describe("MTree", () => {
 
   it("allows custom API to perform mutations on the state tree", () => {
 
-    @Model
     class User {
       deletePost(index) {
         this.posts.splice(index, 1)
@@ -83,7 +81,6 @@ describe("MTree", () => {
 
   it("bounds methods and getters to the proxied tree node", () => {
 
-    @Model
     class User {
       get title() {
         return "Mr."
@@ -121,7 +118,6 @@ describe("MTree", () => {
 
   it("supports model inheritance", () => {
 
-    @Model
     class User {
       get title() {
         return "Mr."
@@ -153,11 +149,11 @@ describe("MTree", () => {
 
   it("allows passing methods around as reference", () => {
 
-    const User = Model(class {
+    class User {
       fullName() {
         return `${this.firstName} ${this.lastName}`
       }
-    })
+    }
 
     const tree = new MTree({
       user: {
@@ -179,7 +175,7 @@ describe("MTree", () => {
   // methods.
   it("cannot bind arrow function properties to the proxied tree node", () => {
 
-    const User = Model(class {
+    class User {
       get title() {
         return "Mr."
       }
@@ -187,7 +183,7 @@ describe("MTree", () => {
       fullName = () => {
         return `${this.title} ${this.firstName} ${this.lastName}`
       }
-    })
+    }
 
     const tree = new MTree({
       user: {
