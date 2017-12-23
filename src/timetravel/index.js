@@ -1,8 +1,8 @@
 import Timeline from "./timeline"
 
 const timetravel = (Store) => class extends Store {
-  constructor(initialState) {
-    super(initialState)
+  constructor(initialState, options) {
+    super(initialState, options)
     this.timeline = new Timeline(this)
   }
 }

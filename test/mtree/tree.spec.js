@@ -6,8 +6,7 @@ import MTree, { Model } from "../../src/mtree"
 describe("MTree", () => {
   it("registers a custom node handler to a given path", () => {
 
-    @Model
-    class User {}
+    const User = Model(class {})
 
     const tree = new MTree({
       user: {
@@ -17,7 +16,7 @@ describe("MTree", () => {
 
     tree.register("/user", User)
 
-    expect(tree.root.user.constructor).to.eq(User)
+    expect(tree.root.user.constructor.name).to.eq("bound Model")
     expect(tree.root.user.firstName).to.eq("Diego")
   })
 
@@ -38,9 +37,9 @@ describe("MTree", () => {
 
     tree.register("/user/posts/:index", Post)
 
-    expect(tree.root.user.posts[0].constructor).to.eq(Post)
-    expect(tree.root.user.posts[1].constructor).to.eq(Post)
-    expect(tree.root.user.posts[2].constructor).to.eq(Post)
+    expect(tree.root.user.posts[0].constructor.name).to.eq("bound Model")
+    expect(tree.root.user.posts[1].constructor.name).to.eq("bound Model")
+    expect(tree.root.user.posts[2].constructor.name).to.eq("bound Model")
     expect(tree.root.user.posts[0]).to.deep.eq({ title: "Nice!" })
     expect(tree.root.user.posts[1]).to.deep.eq({ title: "Sweet!" })
     expect(tree.root.user.posts[2]).to.deep.eq({ title: "Super!" })
@@ -152,14 +151,35 @@ describe("MTree", () => {
     expect(user.fullName).to.eq("Mr. customer Diego Borges")
   })
 
+  it("allows passing methods around as reference", () => {
+
+    const User = Model(class {
+      fullName() {
+        return `${this.firstName} ${this.lastName}`
+      }
+    })
+
+    const tree = new MTree({
+      user: {
+        firstName: "Diego",
+        lastName: "Borges",
+      }
+    })
+
+    tree.register("/user", User)
+
+    const fullNameFn = tree.root.user.fullName
+
+    expect(fullNameFn()).to.eq("Diego Borges")
+  })
+
   // NOTE this is a current limitation in Arbor. Due to how es6 binds arrow
   // functions to the receiver's scope, it is not possible to overide the
   // receiver so it points to the proxy as it does on getters and regular
   // methods.
   it("cannot bind arrow function properties to the proxied tree node", () => {
 
-    @Model
-    class User {
+    const User = Model(class {
       get title() {
         return "Mr."
       }
@@ -167,7 +187,7 @@ describe("MTree", () => {
       fullName = () => {
         return `${this.title} ${this.firstName} ${this.lastName}`
       }
-    }
+    })
 
     const tree = new MTree({
       user: {
