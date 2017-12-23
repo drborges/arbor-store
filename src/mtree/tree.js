@@ -1,4 +1,5 @@
 import PTree from "../ptree"
+import Model from "../mtree/model"
 import Registry from "../mtree/registry"
 
 export default class MTree extends PTree {
@@ -19,6 +20,6 @@ export default class MTree extends PTree {
   }
 
   register(path, Type) {
-    this.registry.register(path, Type)
+    this.registry.register(path, Model(Type))
   }
 }
