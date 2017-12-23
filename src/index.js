@@ -1,21 +1,17 @@
 import Tree, { Path } from "./ptree"
 
-export { Tree, Path }
 export connect from "./react/connect"
 export timetravel from "./timetravel"
 
 export default class Store {
-  constructor(initialState = {}) {
-    this.tree = new Tree(initialState)
-  }
+  constructor(initialState = {}, { Engine = Tree } = {}) {
+    this.tree = new Engine({})
 
-  set(state) {
-    if (state.constructor === Promise) {
-      state.then(value => this.tree.setRoot(value))
-      return
+    if (initialState.constructor === Promise) {
+      initialState.then(value => this.tree.setRoot(value))
+    } else {
+      this.tree.setRoot(initialState)
     }
-
-    this.tree.setRoot(state)
   }
 
   subscribe(path, subscriber) {

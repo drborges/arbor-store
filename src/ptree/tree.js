@@ -3,24 +3,8 @@ import Pubsub from "./pubsub"
 import Mutator from "./mutator"
 import { NodeObject, NodeArray } from "./node"
 
-class NodeWrapper {
-  registry = {}
-
-  for(path) {
-    const registeredPaths = Object.keys(this.registry)
-    const registeredPath = registeredPaths.find(registeredPath => path.match(registeredPath))
-    return this.registry[registeredPath]
-  }
-
-  register(path, Type) {
-    const regexPath = path.toString().replace(":index", "\\d+")
-    this.registry[regexPath] = Type
-  }
-}
-
 export default class Tree {
-  constructor(initialState, { pubsub = new Pubsub, mutator = new Mutator, wrapper = new NodeWrapper } = {}) {
-    this.wrapper = wrapper
+  constructor(initialState, { pubsub = new Pubsub, mutator = new Mutator } = {}) {
     this.pubsub = pubsub
     this.mutator = mutator
     this.root = this.create(Path.root, initialState)
@@ -31,20 +15,9 @@ export default class Tree {
   }
 
   create(path, value, children = {}) {
-    const node = Array.isArray(value) ?
+    return Array.isArray(value) ?
       new NodeArray(this, path, value, children) :
       new NodeObject(this, path, value, children)
-
-    return this.wrapped(node)
-  }
-
-  wrapped(proxy) {
-    const Wrapper = this.wrapper.for(proxy.$path)
-    return Wrapper ? new Wrapper(proxy) : proxy
-  }
-
-  register(path, Type) {
-    this.wrapper.register(path, Type)
   }
 
   setRoot(value) {
