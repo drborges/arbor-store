@@ -2,9 +2,9 @@ import sinon from "sinon"
 import { expect } from "chai"
 
 import { Path } from "../../src/ptree"
-import Tree, { Node, Model } from "../../src/ptree"
+import PTree, { Node } from "../../src/ptree"
 
-describe("Tree", () => {
+describe("PTree", () => {
   describe("#get", () => {
     /*
      * tree --> [root]
@@ -12,7 +12,7 @@ describe("Tree", () => {
      *           name = "Diego"
      */
     it("cannot access unexisting props", () => {
-      const tree = new Tree({ name: "Diego" })
+      const tree = new PTree({ name: "Diego" })
 
       expect(tree.root.age).to.be.undefined
     })
@@ -24,7 +24,7 @@ describe("Tree", () => {
      */
     it("creates a tree node of hight 1", () => {
       const value = { name: "Diego" }
-      const tree = new Tree(value)
+      const tree = new PTree(value)
 
       expect(tree.root).to.not.eq(value)
       expect(tree.root).to.deep.eq(value)
@@ -40,7 +40,7 @@ describe("Tree", () => {
      */
     it("creates a tree node of hight 2", () => {
       const value = { user: { name: "Diego" } }
-      const tree = new Tree(value)
+      const tree = new PTree(value)
 
       expect(tree.root).to.not.eq(value)
       expect(tree.root).to.deep.eq(value)
@@ -57,7 +57,7 @@ describe("Tree", () => {
      * name = "Diego"     name = "Borges"
      */
     it("creates references to children proxies when the corresponding paths are accessed", () => {
-      const tree = new Tree({
+      const tree = new PTree({
         user1: { name: "Diego" },
         user2: { name: "Borges" },
       })
@@ -79,7 +79,7 @@ describe("Tree", () => {
      * name = "Diego"     name = "Borges"
      */
     it("caches children proxies", () => {
-      const tree = new Tree({
+      const tree = new PTree({
         user1: { name: "Diego" },
         user2: { name: "Borges" },
       })
@@ -90,7 +90,7 @@ describe("Tree", () => {
 
     it("creates a tree node of hight 2 with an array proxy", () => {
       const value = { users: [{ name: "Diego" }] }
-      const tree = new Tree(value)
+      const tree = new PTree(value)
 
       expect(tree.root).to.not.eq(value)
       expect(tree.root).to.deep.eq(value)
@@ -111,7 +111,7 @@ describe("Tree", () => {
      */
     it("updates the tree with a new root representing the new state", () => {
       const value = { name: "Diego" }
-      const tree = new Tree(value)
+      const tree = new PTree(value)
       const node = tree.root
 
       node.name = "Borges"
@@ -168,7 +168,7 @@ describe("Tree", () => {
      */
     it("reuses subtree references that were not affected by the mutation", () => {
       const value = { user: { name: "Diego", posts: [{ title: "Sweet!" }] } }
-      const tree = new Tree(value)
+      const tree = new PTree(value)
       const root = tree.root
       const userPosts = root.user.posts
 
@@ -195,7 +195,7 @@ describe("Tree", () => {
     */
    it("mutates a non-leaf node", () => {
      const value = { user: { name: "Diego", posts: [{ title: "Sweet!" }] } }
-     const tree = new Tree(value)
+     const tree = new PTree(value)
      const root = tree.root
      const user = tree.root.user
 
@@ -220,7 +220,7 @@ describe("Tree", () => {
     *                   title = "Sweet!"
     */
    it("mutates proxy $value besides its $children proxies", () => {
-     const tree = new Tree({ user: { name: "Diego", posts: [{ title: "Sweet!" }]}})
+     const tree = new PTree({ user: { name: "Diego", posts: [{ title: "Sweet!" }]}})
      const root = tree.root
 
      tree.root.user.name = "Borges"
@@ -232,7 +232,7 @@ describe("Tree", () => {
 
   describe("#subscribe", () => {
     it("subscribes to mutations to the root of the tree", (done) => {
-      const tree = new Tree({
+      const tree = new PTree({
         posts: [
           { title: "nice!" },
           { title: "sweet!" },
@@ -256,7 +256,7 @@ describe("Tree", () => {
 
     it("unsubscribes from mutations to the tree", () => {
       const subscriber = sinon.spy()
-      const tree = new Tree({
+      const tree = new PTree({
         posts: [
           { title: "nice!" },
           { title: "sweet!" },
@@ -270,186 +270,6 @@ describe("Tree", () => {
       tree.root.posts.splice(2, 1)
 
       expect(subscriber).to.have.not.been.called
-    })
-  })
-
-  describe("#register", () => {
-    it("registers a custom node handler to a given path", () => {
-
-      @Model
-      class User {}
-
-      const tree = new Tree({
-        user: {
-          firstName: "Diego",
-        }
-      })
-
-      tree.register("/user", User)
-
-      expect(tree.root.user.constructor).to.eq(User)
-      expect(tree.root.user.firstName).to.eq("Diego")
-    })
-
-    it("registers a custom node handler to a path with wildcard", () => {
-
-      @Model
-      class Post {}
-
-      const tree = new Tree({
-        user: {
-          posts: [
-            { title: "Nice!" },
-            { title: "Sweet!" },
-            { title: "Super!" },
-          ],
-        }
-      })
-
-      tree.register("/user/posts/:index", Post)
-
-      expect(tree.root.user.posts[0].constructor).to.eq(Post)
-      expect(tree.root.user.posts[1].constructor).to.eq(Post)
-      expect(tree.root.user.posts[2].constructor).to.eq(Post)
-      expect(tree.root.user.posts[0]).to.deep.eq({ title: "Nice!" })
-      expect(tree.root.user.posts[1]).to.deep.eq({ title: "Sweet!" })
-      expect(tree.root.user.posts[2]).to.deep.eq({ title: "Super!" })
-    })
-
-    it("allows custom API to perform mutations on the state tree", () => {
-
-      @Model
-      class User {
-        deletePost(index) {
-          this.posts.splice(index, 1)
-        }
-      }
-
-      const tree = new Tree({
-        user: {
-          posts: [
-            { title: "Nice!" },
-            { title: "Sweet!" },
-            { title: "Super!" },
-          ],
-        }
-      })
-
-      tree.register("/user", User)
-
-      const user = tree.root.user
-      user.deletePost(1)
-
-      expect(user.posts).to.deep.eq([
-        { title: "Nice!" },
-        { title: "Sweet!" },
-        { title: "Super!" },
-      ])
-
-      expect(tree.root.user.posts).to.deep.eq([
-        { title: "Nice!" },
-        { title: "Super!" },
-      ])
-    })
-
-    it("bounds methods and getters to the proxied tree node", () => {
-
-      @Model
-      class User {
-        get title() {
-          return "Mr."
-        }
-
-        get fullName() {
-          return `${this.title} ${this.firstName} ${this.lastName}`
-        }
-
-        getFullName() {
-          return `${this.title} ${this.firstName} ${this.lastName}`
-        }
-      }
-
-      const tree = new Tree({
-        user: {
-          firstName: "Diego",
-          lastName: "Borges",
-        }
-      })
-
-      tree.register("/user", User)
-
-      const user = tree.root.user
-      expect(user.fullName).to.eq("Mr. Diego Borges")
-      expect(user.getFullName()).to.eq("Mr. Diego Borges")
-
-      user.lastName = "Lima"
-
-      expect(user.lastName).to.eq("Borges")
-      expect(tree.root.user.lastName).to.eq("Lima")
-      expect(tree.root.user.getFullName()).to.eq("Mr. Diego Lima")
-      expect(tree.root.user.fullName).to.eq("Mr. Diego Lima")
-    })
-
-    it("supports model inheritance", () => {
-
-      @Model
-      class User {
-        get title() {
-          return "Mr."
-        }
-
-        get fullName() {
-          return `${this.title} ${this.firstName} ${this.lastName}`
-        }
-      }
-
-      class Customer extends User {
-        get title() {
-          return "Mr. customer"
-        }
-      }
-
-      const tree = new Tree({
-        user: {
-          firstName: "Diego",
-          lastName: "Borges",
-        }
-      })
-
-      tree.register("/user", Customer)
-
-      const user = tree.root.user
-      expect(user.fullName).to.eq("Mr. customer Diego Borges")
-    })
-
-    // NOTE this is a current limitation in Arbor. Due to how es6 binds arrow
-    // functions to the receiver's scope, it is not possible to overide the
-    // receiver so it points to the proxy as it does on getters and regular
-    // methods.
-    it("cannot bind arrow function properties to the proxied tree node", () => {
-
-      @Model
-      class User {
-        get title() {
-          return "Mr."
-        }
-
-        fullName = () => {
-          return `${this.title} ${this.firstName} ${this.lastName}`
-        }
-      }
-
-      const tree = new Tree({
-        user: {
-          firstName: "Diego",
-          lastName: "Borges",
-        }
-      })
-
-      tree.register("/user", User)
-
-      const user = tree.root.user
-      expect(user.fullName()).to.eq("Mr. undefined undefined")
     })
   })
 })
