@@ -1,10 +1,12 @@
-import Tree, { Path } from "./ptree"
+import PTree, { Path } from "./ptree"
+import MTree, { Model } from "./mtree"
 
+export { PTree, MTree, Model }
 export connect from "./react/connect"
 export timetravel from "./timetravel"
 
 export default class Store {
-  constructor(initialState = {}, { Engine = Tree } = {}) {
+  constructor(initialState = {}, { Engine = PTree } = {}) {
     this.tree = new Engine({})
 
     if (initialState.constructor === Promise) {
