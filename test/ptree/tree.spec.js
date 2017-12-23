@@ -390,6 +390,38 @@ describe("Tree", () => {
       expect(tree.root.user.fullName).to.eq("Mr. Diego Lima")
     })
 
+    it("supports model inheritance", () => {
+
+      @Model
+      class User {
+        get title() {
+          return "Mr."
+        }
+
+        get fullName() {
+          return `${this.title} ${this.firstName} ${this.lastName}`
+        }
+      }
+
+      class Customer extends User {
+        get title() {
+          return "Mr. customer"
+        }
+      }
+
+      const tree = new Tree({
+        user: {
+          firstName: "Diego",
+          lastName: "Borges",
+        }
+      })
+
+      tree.register("/user", Customer)
+
+      const user = tree.root.user
+      expect(user.fullName).to.eq("Mr. customer Diego Borges")
+    })
+
     // NOTE this is a current limitation in Arbor. Due to how es6 binds arrow
     // functions to the receiver's scope, it is not possible to overide the
     // receiver so it points to the proxy as it does on getters and regular
