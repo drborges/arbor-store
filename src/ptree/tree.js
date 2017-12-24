@@ -5,13 +5,19 @@ import { NodeObject, NodeArray } from "./node"
 
 export default class Tree {
   constructor(initialState, { pubsub = new Pubsub, mutator = new Mutator } = {}) {
-    this.root = this.create(Path.root, initialState)
     this.pubsub = pubsub
     this.mutator = mutator
+    this.root = this.create(Path.root, initialState)
   }
 
   get(path) {
     return Path.resolve(path).traverse(this.root)
+  }
+
+  create(path, value, children = {}) {
+    return Array.isArray(value) ?
+      new NodeArray(this, path, value, children) :
+      new NodeObject(this, path, value, children)
   }
 
   setRoot(value) {
@@ -23,12 +29,6 @@ export default class Tree {
     this.root = this.root.copy()
     this.mutator.mutate(Path.resolve(path), mutation, this.root)
     this.pubsub.publish(Path.root, this.root)
-  }
-
-  create(path, value, children = {}) {
-    return Array.isArray(value) ?
-      new NodeArray(this, path, value, children) :
-      new NodeObject(this, path, value, children)
   }
 
   subscribe(path, subscriber) {

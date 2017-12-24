@@ -2,9 +2,9 @@ import sinon from "sinon"
 import { expect } from "chai"
 
 import { Path } from "../../src/ptree"
-import Tree, { Node } from "../../src/ptree"
+import PTree, { Node } from "../../src/ptree"
 
-describe("Tree", () => {
+describe("PTree", () => {
   describe("#get", () => {
     /*
      * tree --> [root]
@@ -12,7 +12,7 @@ describe("Tree", () => {
      *           name = "Diego"
      */
     it("cannot access unexisting props", () => {
-      const tree = new Tree({ name: "Diego" })
+      const tree = new PTree({ name: "Diego" })
 
       expect(tree.root.age).to.be.undefined
     })
@@ -24,7 +24,7 @@ describe("Tree", () => {
      */
     it("creates a tree node of hight 1", () => {
       const value = { name: "Diego" }
-      const tree = new Tree(value)
+      const tree = new PTree(value)
 
       expect(tree.root).to.not.eq(value)
       expect(tree.root).to.deep.eq(value)
@@ -40,7 +40,7 @@ describe("Tree", () => {
      */
     it("creates a tree node of hight 2", () => {
       const value = { user: { name: "Diego" } }
-      const tree = new Tree(value)
+      const tree = new PTree(value)
 
       expect(tree.root).to.not.eq(value)
       expect(tree.root).to.deep.eq(value)
@@ -57,7 +57,7 @@ describe("Tree", () => {
      * name = "Diego"     name = "Borges"
      */
     it("creates references to children proxies when the corresponding paths are accessed", () => {
-      const tree = new Tree({
+      const tree = new PTree({
         user1: { name: "Diego" },
         user2: { name: "Borges" },
       })
@@ -79,7 +79,7 @@ describe("Tree", () => {
      * name = "Diego"     name = "Borges"
      */
     it("caches children proxies", () => {
-      const tree = new Tree({
+      const tree = new PTree({
         user1: { name: "Diego" },
         user2: { name: "Borges" },
       })
@@ -90,7 +90,7 @@ describe("Tree", () => {
 
     it("creates a tree node of hight 2 with an array proxy", () => {
       const value = { users: [{ name: "Diego" }] }
-      const tree = new Tree(value)
+      const tree = new PTree(value)
 
       expect(tree.root).to.not.eq(value)
       expect(tree.root).to.deep.eq(value)
@@ -111,7 +111,7 @@ describe("Tree", () => {
      */
     it("updates the tree with a new root representing the new state", () => {
       const value = { name: "Diego" }
-      const tree = new Tree(value)
+      const tree = new PTree(value)
       const node = tree.root
 
       node.name = "Borges"
@@ -168,7 +168,7 @@ describe("Tree", () => {
      */
     it("reuses subtree references that were not affected by the mutation", () => {
       const value = { user: { name: "Diego", posts: [{ title: "Sweet!" }] } }
-      const tree = new Tree(value)
+      const tree = new PTree(value)
       const root = tree.root
       const userPosts = root.user.posts
 
@@ -195,7 +195,7 @@ describe("Tree", () => {
     */
    it("mutates a non-leaf node", () => {
      const value = { user: { name: "Diego", posts: [{ title: "Sweet!" }] } }
-     const tree = new Tree(value)
+     const tree = new PTree(value)
      const root = tree.root
      const user = tree.root.user
 
@@ -220,7 +220,7 @@ describe("Tree", () => {
     *                   title = "Sweet!"
     */
    it("mutates proxy $value besides its $children proxies", () => {
-     const tree = new Tree({ user: { name: "Diego", posts: [{ title: "Sweet!" }]}})
+     const tree = new PTree({ user: { name: "Diego", posts: [{ title: "Sweet!" }]}})
      const root = tree.root
 
      tree.root.user.name = "Borges"
@@ -232,7 +232,7 @@ describe("Tree", () => {
 
   describe("#subscribe", () => {
     it("subscribes to mutations to the root of the tree", (done) => {
-      const tree = new Tree({
+      const tree = new PTree({
         posts: [
           { title: "nice!" },
           { title: "sweet!" },
@@ -256,7 +256,7 @@ describe("Tree", () => {
 
     it("unsubscribes from mutations to the tree", () => {
       const subscriber = sinon.spy()
-      const tree = new Tree({
+      const tree = new PTree({
         posts: [
           { title: "nice!" },
           { title: "sweet!" },
