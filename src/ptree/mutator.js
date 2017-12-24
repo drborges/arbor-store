@@ -9,7 +9,7 @@ class Mutator {
       mutation(node, childProp)
 
     } else {
-      const child = node.$children[childProp]
+      const child = node[childProp]
       // Make sure only nodes affected by the mutation are refreshed. This allows
       // libs such as React to make reference comparissons between objects in
       // order to determine whether a mutation has happened and thus allowing the
