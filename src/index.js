@@ -1,5 +1,5 @@
 import Store from "./store"
 
 export default Store
-export connect from "./react/connect"
+export MTree from "./mtree"
 export timetravel from "./timetravel"
