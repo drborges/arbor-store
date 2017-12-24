@@ -10,18 +10,8 @@ This is work in progress, though, it's already pretty cool :)
 
 A simple Counter APP...
 
-```jsx
-import React from "react"
-import Store, { connect } from "arbor-store"
-
-const CounterApp = ({ counter }) => {
-  return (
-    <div>
-      <span>{counter.count}</span>
-      <button onClick={() => counter.count++} />
-    </div>
-  )
-}
+```js
+import Store from "arbor-store"
 
 const store = new Store({
   counter: {
@@ -29,15 +19,12 @@ const store = new Store({
   }
 })
 
-export default connect(store)(CounterApp)
-```
+store.state.counter.count++
+// Triggers a mutation on the store, incrementing the count
 
-Once an Arbor Store is connected to your React component, the store's state is
-passed via props to the connected component. Regular JS mutations can be applied
-to any non-primitive prop, under the hoods, Arbor uses proxies to ensure these
-mutations do not happen in-place and rather, in an immutable fashion through
-structural sharing, allowing React to re-render the UI in an optimal way. This
-process behavior is very similar to Redux reducers.
+store.state.counter.count--
+// Triggers a mutation on the store, decrementing the count
+```
 
 # Mutation Subscriptions
 
