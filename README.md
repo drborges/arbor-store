@@ -47,7 +47,7 @@ One may subscribe to state changes as such:
 store.subscribe((state) => console.log("New state:", state))
 ```
 
-Additionally, subscription to specific Store `Path` mutations are supported:
+Eventually (this is work in progress) subscriptions to specific mutation paths may be supported:
 
 ```js
 store.subscribe("/users", (users) => {
@@ -76,9 +76,9 @@ be recorded, allowing for interesting use cases such as [State Time Travel](http
 
 Model classes may be used to represent a path(s) within the State Tree. Take the following `Store` as an example:
 
-See the [spike branch](https://github.com/drborges/arbor/tree/feature/arbor-model) for more insights...
-
 ```js
+import Store, { MTree } from "arbor-store"
+
 const store = new Store({
   users: [],
   board: {
@@ -86,15 +86,12 @@ const store = new Store({
     doing: [],
     done: [],
   },
-})
-
-store.bind(User, Board, Todo)
+}, { Engine: MTree }) // Currently models are provided by a different engine
 ```
 
-A model class can then be created to represent a TODO `Board` by simple adding the decorator `@Model` with the path within the state tree containing the board data.
+Models are just simple es6 classes that are explicitly bound to certain paths of the state tree. The following class:
 
 ```js
-@Model("/board")
 class Board {
   createTodo() {
     this.todos.push({ id: Math.random() })
@@ -112,16 +109,17 @@ class Board {
 }
 ```
 
-Now whenever one access `store.board`, and instance of `Board` will be provided.
-
-A model class may be bound to multiple paths within the state tree as well:
+Can be bound to the `/board` path:
 
 ```js
-@Model(
-  "/board/todos/:index",
-  "/board/doing/:index",
-  "/board/done/:index",
-)
+store.bind(Board).to("/board")
+```
+
+Now, every access to `store.state.board` will yield an instance of `Board`.
+
+Additionally, a model class may be bound to multiple paths within the state tree as well:
+
+```js
 class Todo {
   finish() {
     this.status = "done"
@@ -131,21 +129,34 @@ class Todo {
     this.status = "doing"
   }
 }
+
+store.bind(Todo).to(
+  "/board/todos/:index",
+  "/board/doing/:index",
+  "/board/done/:index",
+)
 ```
 
-In order to implement a model that represents a list of nodes within the state tree, simply extend the `Array` class.
+Models can represent any State Tree path, even array nodes:
 
 ```js
-@Model(
+class TodoList {
+  sortBy(propName) {
+    // custom sorting logic for todos
+  }
+}
+
+store.bind(TodoList).to(
   "/board/todos",
   "/board/doing",
   "/board/done",
 )
-class TodoList extends Array {
-  sort() {
-    // custom sorting logic for todos
-  }
-}
 ```
 
-The model above represents different lists of TODO entries.
+#### Convention Over Configuration
+
+This is a work in progress, but it would be nice if we could agree on a certain
+convention so that models may be automatically bound to state tree paths without
+the need for explicit mappings. Gotta be careful, though. Conventions over
+configuration is good, but if taken too far they may create an awe environment
+filled with "magical" behavior.
