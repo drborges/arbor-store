@@ -14,7 +14,7 @@ describe("MTree", () => {
       }
     })
 
-    tree.register("/user", User)
+    tree.bind(User).to("/user")
 
     expect(tree.root.user.constructor.name).to.eq("bound Model")
     expect(tree.root.user.firstName).to.eq("Diego")
@@ -34,7 +34,7 @@ describe("MTree", () => {
       }
     })
 
-    tree.register("/user/posts/:index", Post)
+    tree.bind(Post).to("/user/posts/:index")
 
     expect(tree.root.user.posts[0].constructor.name).to.eq("bound Model")
     expect(tree.root.user.posts[1].constructor.name).to.eq("bound Model")
@@ -42,6 +42,29 @@ describe("MTree", () => {
     expect(tree.root.user.posts[0]).to.deep.eq({ title: "Nice!" })
     expect(tree.root.user.posts[1]).to.deep.eq({ title: "Sweet!" })
     expect(tree.root.user.posts[2]).to.deep.eq({ title: "Super!" })
+  })
+
+  it("registers a model to multiple paths", () => {
+
+    class Todo {}
+
+    const tree = new MTree({
+      board: {
+        todos: [{ title: "Do the dishes" }],
+        doing: [{ title: "Clean the house" }],
+        done: [{ title: "Take the dog out" }],
+      }
+    })
+
+    tree.bind(Todo).to(
+      "/board/todos/:index",
+      "/board/doing/:index",
+      "/board/done/:index",
+    )
+
+    expect(tree.root.board.todos[0].constructor.name).to.eq("bound Model")
+    expect(tree.root.board.doing[0].constructor.name).to.eq("bound Model")
+    expect(tree.root.board.done[0].constructor.name).to.eq("bound Model")
   })
 
   it("allows custom API to perform mutations on the state tree", () => {
@@ -62,7 +85,7 @@ describe("MTree", () => {
       }
     })
 
-    tree.register("/user", User)
+    tree.bind(User).to("/user")
 
     const user = tree.root.user
     user.deletePost(1)
@@ -102,7 +125,7 @@ describe("MTree", () => {
       }
     })
 
-    tree.register("/user", User)
+    tree.bind(User).to("/user")
 
     const user = tree.root.user
     expect(user.fullName).to.eq("Mr. Diego Borges")
@@ -141,7 +164,7 @@ describe("MTree", () => {
       }
     })
 
-    tree.register("/user", Customer)
+    tree.bind(Customer).to("/user")
 
     const user = tree.root.user
     expect(user.fullName).to.eq("Mr. customer Diego Borges")
@@ -162,7 +185,7 @@ describe("MTree", () => {
       }
     })
 
-    tree.register("/user", User)
+    tree.bind(User).to("/user")
 
     const fullNameFn = tree.root.user.fullName
 
@@ -192,7 +215,7 @@ describe("MTree", () => {
       }
     })
 
-    tree.register("/user", User)
+    tree.bind(User).to("/user")
 
     const user = tree.root.user
     expect(user.fullName()).to.eq("Mr. undefined undefined")

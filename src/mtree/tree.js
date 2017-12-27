@@ -19,7 +19,12 @@ export default class MTree extends PTree {
     return Model ? new Model(proxy) : proxy
   }
 
-  register(path, Type) {
-    this.registry.register(path, Model(Type))
+  bind(Type) {
+    const model = Model(Type)
+    return {
+      to: (...paths) => {
+        paths.forEach(path => this.registry.register(path, model))
+      }
+    }
   }
 }
