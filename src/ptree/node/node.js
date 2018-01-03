@@ -8,10 +8,10 @@ const isLeafNode = (value) =>
   value.constructor !== Array
 
 export default class Node {
-  constructor($tree, $path, value, $children = {}) {
+  constructor($tree, $path, $value, $children = {}) {
     this.$tree = $tree
     this.$path = $path
-    this.$value = value
+    this.$value = $value
     this.$children = $children
   }
 
@@ -42,6 +42,14 @@ export default class Node {
     }
 
     return true
+  }
+
+  transaction = (path) => (fn) => {
+    if (this.$tree.transactionNode) {
+      throw "Transaction already in progress"
+    } else {
+      this.$tree.mutate(path, mutations.transaction(fn))
+    }
   }
 
   createChild(prop, value) {

@@ -7,6 +7,7 @@ export default class Tree {
   constructor(initialState, { pubsub = new Pubsub, mutator = new Mutator } = {}) {
     this.pubsub = pubsub
     this.mutator = mutator
+    this.transactionNode = null
     this.root = this.create(Path.root, initialState)
   }
 
@@ -26,8 +27,27 @@ export default class Tree {
   }
 
   mutate(path, mutation) {
-    this.root = this.root.copy()
-    this.mutator.mutate(Path.resolve(path), mutation, this.root)
+    if (this.transactionNode) {
+      this.mutateWithinTransaction(path, mutation)
+    } else {
+      this.mutateAndPublish(path, mutation)
+    }
+  }
+
+  mutateWithinTransaction(path, mutation) {
+    const transactionPath = this.transactionNode.$path.child(".*")
+
+    if (!path.match(transactionPath)) {
+      throw "Cannot mutate node outside transaction path"
+    }
+
+    this.mutator.mutate(path, mutation, this.transactionNode)
+  }
+
+  mutateAndPublish(path, mutation) {
+    const root = this.root.copy()
+    this.mutator.mutate(path, mutation, root)
+    this.root = root
     this.pubsub.publish(Path.root, this.root)
   }
 

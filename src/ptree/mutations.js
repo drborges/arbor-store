@@ -51,6 +51,12 @@ const shift = () => (node) => {
   node.$value.shift()
 }
 
+const transaction = (fn) => (node) => {
+  node.$tree.transactionNode = node
+  fn(node)
+  node.$tree.transactionNode = null
+}
+
 const unshift = (items) => (node) => {
   node.$children = []
   node.$value.unshift(...items)
@@ -63,5 +69,6 @@ export default {
   shift,
   sort,
   splice,
+  transaction,
   unshift,
 }
