@@ -65,6 +65,7 @@ export class Node {
 
   transaction(fn) {
     this.$tree.mutate(this.$path, mutations.transaction(fn))
+    return this.$tree.get(this.$path)
   }
 
   refresh(prop) {
@@ -85,6 +86,10 @@ export class ObjectNode extends Node {
 }
 
 export class ArrayNode extends Node {
+  sort(compare) {
+    return this.transaction(array => array.$value.sort(compare))
+  }
+
   unpack() {
     return [ ...this.$value ]
   }
@@ -95,6 +100,10 @@ export default class Arbor {
     this.nodes = new WeakMap
     this.models = new Registry
     this.root = this.create(new Path, state)
+  }
+
+  get(path) {
+    return path.traverse(this.root)
   }
 
   create(path, value) {

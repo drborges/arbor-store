@@ -173,6 +173,79 @@ describe.only("Arbor", () => {
 
       expect(tree.root.posts.$path.toString()).to.eq("/posts")
     })
+
+    describe("Array#sort", () => {
+      const compareUsers = (user1, user2) => {
+        if (user1.name > user2.name) return 1
+        if (user1.name < user2.name) return -1
+        return 0
+      }
+
+      it("does not mutate original data", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const originalUsers = tree.root.users
+
+        const sorted = tree.root.users.sort(compareUsers)
+
+        expect(sorted).to.not.deep.eq(originalUsers)
+        expect(originalUsers).to.deep.eq([
+          { name: "Diego" },
+          { name: "Borges" },
+          { name: "Bianca" },
+        ])
+      })
+
+      it("sorts the array node", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const sorted = tree.root.users.sort(compareUsers)
+
+        expect(sorted).to.eq(tree.root.users)
+
+        expect(sorted).to.deep.eq([
+          { name: "Bianca" },
+          { name: "Borges" },
+          { name: "Diego" },
+        ])
+
+        expect(tree.root.users).to.deep.eq([
+          { name: "Bianca" },
+          { name: "Borges" },
+          { name: "Diego" },
+        ])
+      })
+
+      it("keeps array item's path in sync", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const sorted = tree.root.users.sort(compareUsers)
+
+        expect(sorted.map(user => user.$path.toString())).to.deep.eq([
+          "/users/0",
+          "/users/1",
+          "/users/2",
+        ])
+      })
+    })
   })
 
   describe("Model", () => {
