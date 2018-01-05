@@ -8,7 +8,7 @@ export default class Registry {
   }
 
   register(path, Type) {
-    const regexPath = path.toString().replace(":index", "\\d+")
+    const regexPath = path.toString().replace(/:index/g, "\\d+")
     this.registry[regexPath] = Type
   }
 }
