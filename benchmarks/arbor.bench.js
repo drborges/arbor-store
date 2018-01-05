@@ -18,20 +18,19 @@ const largeTree = new Arbor({
 })
 
 const benchmark = new Benchmark({ sample: 10 })
-const reports = []
 
-reports.push(benchmark.measure(`Redux-like mutation on Array(${arrayLength})`, () => {
+benchmark.measure(`Redux-like mutation on Array(${arrayLength})`, () => {
   const copy = arrayWith(arrayLength, (i) => ({ done: false })).map(todo => ({ done: !todo.done }))
-}))
+})
 
-reports.push(benchmark.measure(`Arbor mutation on Array(${arrayLength})`, () => {
+benchmark.measure(`Arbor mutation on Array(${arrayLength})`, () => {
   largeTree.root.todos.forEach(todo => { todo.done = !todo.done })
-}))
+})
 
-reports.push(benchmark.measure(`Arbor transactional mutation on Array(${arrayLength})`, () => {
+benchmark.measure(`Arbor transactional mutation on Array(${arrayLength})`, () => {
   largeTree.root.todos.transaction(todos => {
     todos.forEach(todo => { todo.done = !todo.done })
   })
-}))
+})
 
-console.log(reports)
+console.log(benchmark.reports)

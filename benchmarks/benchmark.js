@@ -1,6 +1,7 @@
 class Benchmark {
   constructor({ sample }) {
     this.sample = sample
+    this.reports = []
   }
 
   measure(name, fn) {
@@ -15,13 +16,13 @@ class Benchmark {
 
     executions.sort()
 
-    return {
+    this.reports.push({
       name,
       executions,
       fastest: executions[0],
       slowest: executions[executions.length - 1],
       avg: executions.reduce((sum, next) => sum + next, 0) / executions.length
-    }
+    })
   }
 }
 
