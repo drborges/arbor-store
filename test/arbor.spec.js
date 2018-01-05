@@ -1,7 +1,7 @@
 import sinon from "sinon"
 import { expect } from "chai"
 
-import Arbor from "../src/arbor"
+import Arbor, { Node } from "../src/arbor"
 
 describe.only("Arbor", () => {
   it("creates a tree for the given initial state", () => {
@@ -59,6 +59,18 @@ describe.only("Arbor", () => {
       expect(originalRoot).to.not.eq(tree.root)
       expect(originalUser).to.not.eq(tree.root.user)
       expect(originalPosts).to.eq(tree.root.user.posts)
+    })
+
+    it("unpacks value when assigning proxy", () => {
+      const tree = new Arbor({
+        user: { name: "Diego", posts: [{ title: "Sweet!" }] }
+      })
+
+      expect(tree.root.user.posts[0].$path.toString()).to.eq("/user/posts/0")
+
+      tree.root.post = tree.root.user.posts[0]
+
+      expect(tree.root.post.$path.toString()).to.eq("/post")
     })
   })
 
@@ -143,9 +155,21 @@ describe.only("Arbor", () => {
       expect(originalPost1).to.eq(tree.root.user.posts[1])
       expect(tree.root.user.posts[2]).to.deep.eq({ title: "Cool!" })
     })
+
+    it("unpacks value when assigning proxy", () => {
+      const tree = new Arbor({
+        user: { name: "Diego", posts: [{ title: "Sweet!" }] }
+      })
+
+      expect(tree.root.user.posts.$path.toString()).to.eq("/user/posts")
+
+      tree.root.posts = tree.root.user.posts
+
+      expect(tree.root.posts.$path.toString()).to.eq("/posts")
+    })
   })
 
-  describe("models", () => {
+  describe("Model", () => {
     it("wraps nodes within custom model classes", () => {
       class User {
         title = "Mr."
@@ -192,6 +216,38 @@ describe.only("Arbor", () => {
       tree.root.users[0].posts[0].updateTitle("Nice!")
 
       expect(tree.root.users[0].posts[0].title).to.eq("Nice!")
+    })
+
+    it("unpacks object value when assigning proxy", () => {
+      class Post {}
+
+      const tree = new Arbor({
+        user: { name: "Diego", posts: [{ title: "Sweet!" }] }
+      })
+
+      tree.bind(Post).to("/users/:index/posts/:index")
+
+      expect(tree.root.user.posts.$path.toString()).to.eq("/user/posts")
+
+      tree.root.post = tree.root.user.posts[0]
+
+      expect(tree.root.post.$path.toString()).to.eq("/post")
+    })
+
+    it("unpacks array value when assigning proxy", () => {
+      class Posts {}
+
+      const tree = new Arbor({
+        user: { name: "Diego", posts: [{ title: "Sweet!" }] }
+      })
+
+      tree.bind(Posts).to("/users/:index/posts")
+
+      expect(tree.root.user.posts.$path.toString()).to.eq("/user/posts")
+
+      tree.root.posts = tree.root.user.posts
+
+      expect(tree.root.posts.$path.toString()).to.eq("/posts")
     })
   })
 })

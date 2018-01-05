@@ -2,9 +2,16 @@ import { Path } from "./ptree"
 import Model from "./mtree/model"
 import Registry from "./mtree/registry"
 
+/**
+ * Unpacks the proxied value if necessary
+ */
+const unpack = (value) => value.$value !== undefined ?
+  value.unpack() :
+  value
+
 const mutations = {
   set: (value) => (node, prop) => {
-     node.$value[prop] = value
+    node.$value[prop] = unpack(value)
   },
 
   transaction: (fn) => (node, prop) => {
@@ -61,17 +68,21 @@ export class Node {
     this.$value[prop] = child.$value
     return child
   }
-}
 
-class ObjectNode extends Node {
   copy() {
-    return this.$tree.create(this.$path, { ...this.$value })
+    return this.$tree.create(this.$path, this.unpack())
   }
 }
 
-class ArrayNode extends Node {
-  copy() {
-    return this.$tree.create(this.$path, [ ...this.$value ])
+export class ObjectNode extends Node {
+  unpack() {
+    return { ...this.$value }
+  }
+}
+
+export class ArrayNode extends Node {
+  unpack() {
+    return [ ...this.$value ]
   }
 }
 
