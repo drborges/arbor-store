@@ -30,6 +30,10 @@ const isLeafNode = (value) =>
 
 export class Node {
   constructor(tree, path, value) {
+    if (this.constructor === Node) {
+      throw new TypeError("Node is an abstract class and must be subclassed")
+    }
+
     this.$tree = tree
     this.$path = path
     this.$value = value
