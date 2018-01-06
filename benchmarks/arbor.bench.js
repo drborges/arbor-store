@@ -33,4 +33,12 @@ benchmark.measure(`Arbor transactional mutation on Array(${arrayLength})`, () =>
   })
 })
 
+benchmark.measure(`Arbor sorting Array(${arrayLength})`, () => {
+  largeTree.root.todos.sort((todo1, todo2) => {
+    if (todo1.done) return 1
+    if (todo2.done) return -1
+    return 0
+  })
+})
+
 console.log(benchmark.reports)

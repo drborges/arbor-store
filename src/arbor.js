@@ -29,7 +29,7 @@ const isLeafNode = (value) =>
   value.constructor !== Array
 
 export class Node {
-  constructor(tree, path, value) {
+  constructor(tree, path, value, children = new WeakMap) {
     if (this.constructor === Node) {
       throw new TypeError("Node is an abstract class and must be subclassed")
     }
@@ -37,6 +37,7 @@ export class Node {
     this.$tree = tree
     this.$path = path
     this.$value = value
+    this.$children = children
   }
 
   get(target, prop) {
@@ -50,15 +51,20 @@ export class Node {
       return value
     }
 
-    if (!this.$tree.nodes.has(value)) {
-      this.$tree.create(this.$path.child(prop), value)
+    if (!this.$children.has(value)) {
+      const proxy = this.$tree.create(this.$path.child(prop), value)
+      this.$children.set(value, proxy)
     }
 
-    return this.$tree.nodes.get(value)
+    return this.$children.get(value)
   }
 
   set(target, prop, value) {
-    this.$tree.mutate(this.$path.child(prop), mutations.set(value))
+    if (prop === "$children") {
+      this[prop] = value
+    } else {
+      this.$tree.mutate(this.$path.child(prop), mutations.set(value))
+    }
 
     return true
   }
@@ -69,13 +75,19 @@ export class Node {
   }
 
   refresh(prop) {
+    if (prop === undefined) {
+      this.$children = new WeakMap
+      return this
+    }
+
     const child = this[prop].copy()
     this.$value[prop] = child.$value
+    this.$children.set(child.$value, child)
     return child
   }
 
   copy() {
-    return this.$tree.create(this.$path, this.unpack())
+    return this.$tree.create(this.$path, this.unpack(), this.$children)
   }
 }
 
@@ -87,7 +99,19 @@ export class ObjectNode extends Node {
 
 export class ArrayNode extends Node {
   sort(compare) {
-    return this.transaction(array => array.$value.sort(compare))
+    return this.transaction(array => {
+      return array.refresh().$value.sort(compare)
+    })
+  }
+
+  splice(start, count, ...items) {
+    let removed
+
+    this.transaction(array => {
+      removed = array.refresh().$value.splice(start, count, ...items)
+    })
+
+    return removed
   }
 
   unpack() {
@@ -97,7 +121,6 @@ export class ArrayNode extends Node {
 
 export default class Arbor {
   constructor(state) {
-    this.nodes = new WeakMap
     this.models = new Registry
     this.root = this.create(new Path, state)
   }
@@ -106,14 +129,12 @@ export default class Arbor {
     return path.traverse(this.root)
   }
 
-  create(path, value) {
+  create(path, value, children) {
     const node = Array.isArray(value) ?
-      new ArrayNode(this, path, value) :
-      new ObjectNode(this, path, value)
+      new ArrayNode(this, path, value, children) :
+      new ObjectNode(this, path, value, children)
 
-    const proxy = this.wrapped(new Proxy(value, node))
-    this.nodes.set(value, proxy)
-    return proxy
+    return this.wrapped(new Proxy(value, node))
   }
 
   wrapped(proxy) {

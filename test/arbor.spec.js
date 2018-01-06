@@ -3,6 +3,10 @@ import { expect } from "chai"
 
 import Arbor, { Node } from "../src/arbor"
 
+const warmupCache = (tree) => {
+  tree.root.users.forEach(user => user.name)
+}
+
 describe.only("Arbor", () => {
   it("creates a tree for the given initial state", () => {
     const tree = new Arbor({
@@ -228,7 +232,7 @@ describe.only("Arbor", () => {
         ])
       })
 
-      it("keeps array item's path in sync", () => {
+      it("keeps array items' path in sync", () => {
         const tree = new Arbor({
           users: [
             { name: "Diego" },
@@ -237,12 +241,85 @@ describe.only("Arbor", () => {
           ]
         })
 
+        warmupCache(tree)
+
         const sorted = tree.root.users.sort(compareUsers)
 
         expect(sorted.map(user => user.$path.toString())).to.deep.eq([
           "/users/0",
           "/users/1",
           "/users/2",
+        ])
+      })
+    })
+
+    describe("Array#splice", () => {
+      it("does not mutate original data", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const originalUsers = tree.root.users
+
+        tree.root.users.splice(1, 1, { name: "Alice" }, { name: "Bob" })
+
+        expect(originalUsers).to.deep.eq([
+          { name: "Diego" },
+          { name: "Borges" },
+          { name: "Bianca" },
+        ])
+      })
+
+      it("splices the array node", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const removed = tree.root.users.splice(1, 1, { name: "Alice" }, { name: "Bob" })
+
+        expect(removed).to.be.an.instanceof(Object)
+        expect(removed).to.deep.eq([
+          { name: "Borges" },
+        ])
+
+        expect(tree.root.users).to.deep.eq([
+          { name: "Diego" },
+          { name: "Alice" },
+          { name: "Bob" },
+          { name: "Bianca" },
+        ])
+      })
+
+      it("keeps array items' path in sync", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        warmupCache(tree)
+
+        const originalBianca = tree.root.users[2]
+
+        tree.root.users.splice(1, 1, { name: "Alice" }, { name: "Bob" })
+
+        expect(originalBianca.$path.toString()).to.eq("/users/2")
+
+        expect(tree.root.users.map(user => user.$path.toString())).to.deep.eq([
+          "/users/0",
+          "/users/1",
+          "/users/2",
+          "/users/3",
         ])
       })
     })

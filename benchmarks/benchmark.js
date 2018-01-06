@@ -5,11 +5,12 @@ class Benchmark {
   }
 
   measure(name, fn) {
+    let result
     const executions = []
 
     for (let i = 0; i < this.sample; i++) {
       const executionStartTime = new Date().getTime()
-      fn()
+      result = fn()
       const executionEndTime = new Date().getTime()
       executions.push(executionEndTime - executionStartTime)
     }
@@ -23,6 +24,8 @@ class Benchmark {
       slowest: executions[executions.length - 1],
       avg: executions.reduce((sum, next) => sum + next, 0) / executions.length
     })
+
+    return result
   }
 }
 
