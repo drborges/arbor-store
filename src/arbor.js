@@ -2,6 +2,29 @@ import { Path } from "./ptree"
 import Model from "./mtree/model"
 import Registry from "./mtree/registry"
 
+class PubSub {
+  subscriptions = []
+
+  subscribe(path, subscriber) {
+    const subscription = { path, subscriber }
+    this.subscriptions.push(subscription)
+
+    return () => {
+      this.subscriptions = this.subscriptions.filter(s => s !== subscription)
+    }
+  }
+
+  publish(mutationPath, newRoot, oldRoot) {
+    this.subscriptions.forEach(({ path, subscriber }) => {
+      if (path === Path.root) {
+        subscriber(newRoot, oldRoot)
+      } else if (mutationPath.match(path)) {
+        subscriber(mutationPath.traverse(newRoot), mutationPath.traverse(oldRoot))
+      }
+    })
+  }
+}
+
 class Stack {
   items = []
 
@@ -184,9 +207,19 @@ export class ArrayNode extends Node {
 
 export default class Arbor {
   constructor(state) {
-    this.transactions = new Stack
+    this.pubsub = new PubSub
     this.models = new Registry
+    this.transactions = new Stack
     this.root = this.create(new Path, state)
+  }
+
+  subscribe(path, subscriber) {
+    if (typeof path === "function") {
+      subscriber = path
+      path = Path.root
+    }
+
+    return this.pubsub.subscribe(path, subscriber)
   }
 
   get(path) {
@@ -225,9 +258,11 @@ export default class Arbor {
 
       mutate(mutationPath, mutation, node)
     } else {
-      const root = this.root.$copy()
-      mutate(mutationPath, mutation, root)
-      this.root = root
+      const oldRoot = this.root
+      const newRoot = this.root.$copy()
+      mutate(mutationPath, mutation, newRoot)
+      this.root = newRoot
+      this.pubsub.publish(mutationPath, newRoot, oldRoot)
     }
   }
 }

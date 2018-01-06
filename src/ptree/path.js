@@ -24,7 +24,7 @@ export default class Path {
   }
 
   match(path) {
-    const pattern = new RegExp(`^${path.toString()}$`)
+    const pattern = new RegExp(`^${path.toString().replace(":index", "\\d+")}$`)
     return pattern.test(this.toString())
   }
 

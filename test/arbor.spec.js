@@ -407,7 +407,7 @@ describe.only("Arbor", () => {
     })
   })
 
-  context("$transactions", () => {
+  describe("#$transaction", () => {
     it("supports nested (stacked) transactions", () => {
       const tree = new Arbor({
         users: [
@@ -442,6 +442,69 @@ describe.only("Arbor", () => {
       })
 
       expect(invalidTransaction).to.throw()
+    })
+  })
+
+  describe("#subscribe", () => {
+    it("subscribes to any mutation", () => {
+      const tree = new Arbor({
+        user: { name: "Diego" }
+      })
+
+      tree.subscribe((newState, oldState) => {
+        expect(oldState).to.deep.eq({
+          user: { name: "Diego" }
+        })
+
+        expect(newState).to.deep.eq({
+          user: { name: "Borges" }
+        })
+      })
+
+      tree.root.user.name = "Borges"
+    })
+
+    it("subscribes to mutations to a particular path", (done) => {
+      const tree = new Arbor({
+        user: { name: "Diego" }
+      })
+
+      tree.subscribe("/user/name", (newName, oldName) => {
+        expect(oldName).to.eq("Diego")
+        expect(newName).to.eq("Borges")
+        done()
+      })
+
+      tree.root.user.name = "Borges"
+    })
+
+    it("subscribes to mutations to a wildcard path", (done) => {
+      const tree = new Arbor({
+        users: [{ name: "Bob" }, { name: "Diego" }]
+      })
+
+      tree.subscribe("/users/:index/name", (newName, oldName) => {
+        expect(oldName).to.eq("Diego")
+        expect(newName).to.eq("Borges")
+        done()
+      })
+
+      tree.root.users[1].name = "Borges"
+    })
+
+    it("unsubscribes from mutation notifications", () => {
+      const subscriber = sinon.spy()
+
+      const tree = new Arbor({
+        users: [{ name: "Bob" }, { name: "Diego" }]
+      })
+
+      const unsubscribe = tree.subscribe(subscriber)
+      unsubscribe()
+
+      tree.root.users[1].name = "Borges"
+
+      expect(subscriber).to.not.have.been.called
     })
   })
 })
