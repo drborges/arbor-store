@@ -2,6 +2,32 @@ import { Path } from "./ptree"
 import Model from "./mtree/model"
 import Registry from "./mtree/registry"
 
+class Stack {
+  constructor() {
+    this.items = []
+  }
+
+  push(item) {
+    this.items.push(item)
+  }
+
+  pop() {
+    return this.items.pop()
+  }
+
+  clear() {
+    this.items = []
+  }
+
+  get peek() {
+    return this.items.slice(-1)[0]
+  }
+
+  get length() {
+    return this.items.length
+  }
+}
+
 /**
  * Unpacks the proxied value if necessary
  */
@@ -16,9 +42,9 @@ const mutations = {
 
   transaction: (fn) => (node, prop) => {
     const child = node.refresh(prop)
-    node.$tree.transactionNode = child
+    node.$tree.transactions.push(child)
     fn(child)
-    node.$tree.transactionNode = null
+    node.$tree.transactions.pop()
   }
 }
 
@@ -121,6 +147,7 @@ export class ArrayNode extends Node {
 
 export default class Arbor {
   constructor(state) {
+    this.transactions = new Stack
     this.models = new Registry
     this.root = this.create(new Path, state)
   }
@@ -152,8 +179,10 @@ export default class Arbor {
   }
 
   mutate(mutationPath, mutation) {
-    if (this.transactionNode) {
-      this.applyMutation(mutationPath, mutation, this.transactionNode)
+    const node = this.transactions.peek
+
+    if (node) {
+      this.applyMutation(mutationPath, mutation, node)
     } else {
       const root = this.root.copy()
       this.applyMutation(mutationPath, mutation, root)

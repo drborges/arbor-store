@@ -406,4 +406,27 @@ describe.only("Arbor", () => {
       expect(tree.root.posts.$path.toString()).to.eq("/posts")
     })
   })
+
+  context("transactions", () => {
+    it("supports nested (stacked) transactions", () => {
+      const tree = new Arbor({
+        users: [
+          { name: "Diego", posts: [{ stars: 1 }, { stars: 2 }]},
+          { name: "Borges", posts: [{ stars: 3 }, { stars: 10 }]},
+        ]
+      })
+
+      const users = tree.root.users.transaction(users => {
+        users[0].posts.sort((post1, post2) => post2.stars - post1.stars)
+        users[1].posts.sort((post1, post2) => post2.stars - post1.stars)
+        users[0].name = "drborges"
+      })
+
+      expect(users).to.eq(tree.root.users)
+      expect(users).to.deep.eq([
+        { name: "drborges", posts: [{ stars: 2 }, { stars: 1 }]},
+        { name: "Borges", posts: [{ stars: 10 }, { stars: 3 }]},
+      ])
+    })
+  })
 })
