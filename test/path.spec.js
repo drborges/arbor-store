@@ -1,5 +1,5 @@
 import { expect } from "chai"
-import { Path } from "../../src/ptree"
+import Path from "../src/path"
 
 describe("Path", () => {
   describe("#toString", () => {
@@ -48,6 +48,13 @@ describe("Path", () => {
       const path2 = new Path("users", ".")
 
       expect(path1.match(path2)).to.be.false
+    })
+
+    it("matches a given wildcard path", () => {
+      const path1 = new Path("users", "0", "comments", "1")
+      const path2 = new Path("users", ":index", "comments", ":index")
+
+      expect(path1.match(path2)).to.be.true
     })
   })
 

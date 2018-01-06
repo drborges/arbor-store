@@ -1,13 +1,13 @@
 import sinon from "sinon"
 import { expect } from "chai"
 
-import Arbor, { Node, ArrayNode, ObjectNode } from "../src/arbor"
+import Arbor, { Node, ArrayNode, ObjectNode } from "../src"
 
 const warmupCache = (tree) => {
   tree.root.users.forEach(user => user.name)
 }
 
-describe.only("Arbor", () => {
+describe("Arbor", () => {
   it("creates a tree for the given initial state", () => {
     const tree = new Arbor({
       user: { name: "Diego" }

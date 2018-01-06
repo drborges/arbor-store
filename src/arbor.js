@@ -1,103 +1,8 @@
-import { Path } from "./ptree"
-import Model from "./mtree/model"
-import Registry from "./mtree/registry"
-
-class PubSub {
-  subscriptions = []
-
-  subscribe(path, subscriber) {
-    const subscription = { path, subscriber }
-    this.subscriptions.push(subscription)
-
-    return () => {
-      this.subscriptions = this.subscriptions.filter(s => s !== subscription)
-    }
-  }
-
-  publish(mutationPath, newRoot, oldRoot) {
-    this.subscriptions.forEach(({ path, subscriber }) => {
-      if (path === Path.root) {
-        subscriber(newRoot, oldRoot)
-      } else if (mutationPath.match(path)) {
-        subscriber(mutationPath.traverse(newRoot), mutationPath.traverse(oldRoot))
-      }
-    })
-  }
-}
-
-class Stack {
-  items = []
-
-  push(item) {
-    this.items.push(item)
-  }
-
-  pop() {
-    return this.items.pop()
-  }
-
-  clear() {
-    this.items = []
-  }
-
-  peek() {
-    return this.items.slice(-1)[0]
-  }
-
-  get length() {
-    return this.items.length
-  }
-}
-
-class Cache {
-  items = new WeakMap
-
-  set(key, value) {
-    this.items.set(key, value)
-  }
-
-  get(key) {
-    return this.items.get(key)
-  }
-
-  has(key) {
-    return this.items.has(key)
-  }
-
-  delete(key) {
-    return this.items.delete(key)
-  }
-
-  clear() {
-    this.items = new WeakMap
-  }
-}
-
-/**
- * Unpacks the proxied value if necessary
- */
-const unpack = (value) => value.$value !== undefined ?
-  value.$unpack() :
-  value
-
-const mutations = {
-  set: (value) => (node, prop) => {
-    node.$value[prop] = unpack(value)
-  },
-
-  transaction: (fn) => (node, prop) => {
-    const child = node.$refreshChild(prop)
-    node.$tree.transactions.push(child)
-    fn(child)
-    node.$tree.transactions.pop()
-  }
-}
-
-const isLeafNode = (value) =>
-  value === undefined ||
-  value === null ||
-  value.constructor !== Object &&
-  value.constructor !== Array
+import Path from "./path"
+import Stack from "./stack"
+import PubSub from "./pubsub"
+import createNode from "./nodes"
+import Model, { Registry } from "./model"
 
 const mutate = (mutationPath, mutation, parent) => {
   const childPath = mutationPath.subpath(parent.$path.depth + 1)
@@ -105,147 +10,8 @@ const mutate = (mutationPath, mutation, parent) => {
 
   if (childPath.match(mutationPath)) {
     mutation(parent, childProp)
-
   } else {
-    const child = parent.$refreshChild(childProp)
-    mutate(mutationPath, mutation, child)
-  }
-}
-
-export class Node {
-  constructor(tree, path, value, children = new Cache) {
-    if (this.constructor === Node) {
-      throw new TypeError("Node is an abstract class and must be subclassed")
-    }
-
-    this.$tree = tree
-    this.$path = path
-    this.$value = value
-    this.$children = children
-  }
-
-  get(target, prop) {
-    const value = target[prop]
-
-    if (this[prop]) {
-      return this[prop]
-    }
-
-    if (isLeafNode(value)) {
-      return value
-    }
-
-    if (!this.$children.has(value)) {
-      this.$createChild(prop, value)
-    }
-
-    return this.$children.get(value)
-  }
-
-  set(target, prop, value) {
-    this.$tree.mutate(this.$path.child(prop), mutations.set(value))
-
-    return true
-  }
-
-  $transaction(fn) {
-    this.$tree.mutate(this.$path, mutations.transaction(fn))
-    return this.$tree.get(this.$path)
-  }
-
-  $refresh() {
-    this.$children.clear()
-    return this
-  }
-
-  $refreshChild(prop) {
-    const child = this[prop].$copy()
-    this.$value[prop] = child.$value
-    this.$children.set(child.$value, child)
-    return child
-  }
-
-  $createChild(prop, value) {
-    const proxy = this.$tree.create(this.$path.child(prop), value)
-    this.$children.set(value, proxy)
-  }
-
-  $copy() {
-    return this.$tree.create(this.$path, this.$unpack(), this.$children)
-  }
-
-  get $transactionPath() {
-    return this.$path.child(".*")
-  }
-}
-
-export class ObjectNode extends Node {
-  $unpack() {
-    return { ...this.$value }
-  }
-}
-
-export class ArrayNode extends Node {
-  fill(item, start, end) {
-    return this.$transaction(array => {
-      array.$refresh().$value.fill(item, start, end)
-    })
-  }
-
-  sort(compare) {
-    return this.$transaction(array => {
-      array.$refresh().$value.sort(compare)
-    })
-  }
-
-  splice(start, count, ...items) {
-    let removed
-
-    this.$transaction(array => {
-      removed = array.$refresh().$value.splice(start, count, ...items)
-    })
-
-    return removed
-  }
-
-  copyWithin(target, start, end) {
-    return this.$transaction(array => {
-      array.$refresh().$value.copyWithin(target, start, end)
-    })
-  }
-
-  shift() {
-    let shifted
-
-    this.$transaction(array => {
-      shifted = array.$refresh().$value.shift()
-    })
-
-    return shifted
-  }
-
-  unshift(item) {
-    let length
-
-    this.$transaction(array => {
-      length = array.$refresh().$value.unshift(item)
-    })
-
-    return length
-  }
-
-  reverse() {
-    let reversed
-
-    this.$transaction(array => {
-      reversed = array.$refresh().$value.reverse()
-    })
-
-    return reversed
-  }
-
-  $unpack() {
-    return [ ...this.$value ]
+    mutate(mutationPath, mutation, parent.$refreshChild(childProp))
   }
 }
 
@@ -271,11 +37,14 @@ export default class Arbor {
   }
 
   create(path, value, children) {
-    const node = Array.isArray(value) ?
-      new ArrayNode(this, path, value, children) :
-      new ObjectNode(this, path, value, children)
-
+    const node = createNode(this, path, value, children)
     return this.wrapped(new Proxy(value, node))
+  }
+
+  restore(newRoot) {
+    const oldRoot = this.root
+    this.root = newRoot
+    this.pubsub.publish(Path.root, newRoot, oldRoot)
   }
 
   wrapped(proxy) {
@@ -308,5 +77,9 @@ export default class Arbor {
       this.root = newRoot
       this.pubsub.publish(mutationPath, newRoot, oldRoot)
     }
+  }
+
+  get state() {
+    return this.root
   }
 }
