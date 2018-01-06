@@ -3,9 +3,7 @@ import Model from "./mtree/model"
 import Registry from "./mtree/registry"
 
 class Stack {
-  constructor() {
-    this.items = []
-  }
+  items = []
 
   push(item) {
     this.items.push(item)
@@ -25,6 +23,30 @@ class Stack {
 
   get length() {
     return this.items.length
+  }
+}
+
+class Cache {
+  items = new WeakMap
+
+  set(key, value) {
+    this.items.set(key, value)
+  }
+
+  get(key) {
+    return this.items.get(key)
+  }
+
+  has(key) {
+    return this.items.has(key)
+  }
+
+  delete(key) {
+    return this.items.delete(key)
+  }
+
+  clear() {
+    this.items = new WeakMap
   }
 }
 
@@ -68,7 +90,7 @@ const mutate = (mutationPath, mutation, parent) => {
 }
 
 export class Node {
-  constructor(tree, path, value, children = new WeakMap) {
+  constructor(tree, path, value, children = new Cache) {
     if (this.constructor === Node) {
       throw new TypeError("Node is an abstract class and must be subclassed")
     }
@@ -98,11 +120,7 @@ export class Node {
   }
 
   set(target, prop, value) {
-    if (prop === "$children") {
-      this[prop] = value
-    } else {
-      this.$tree.mutate(this.$path.child(prop), mutations.set(value))
-    }
+    this.$tree.mutate(this.$path.child(prop), mutations.set(value))
 
     return true
   }
@@ -113,7 +131,7 @@ export class Node {
   }
 
   $refresh() {
-    this.$children = new WeakMap
+    this.$children.clear()
     return this
   }
 
