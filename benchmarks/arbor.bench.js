@@ -24,13 +24,21 @@ benchmark.measure(`Redux-like mutation on Array(${arrayLength})`, () => {
 })
 
 benchmark.measure(`Arbor mutation on Array(${arrayLength})`, () => {
-  largeTree.root.todos.forEach(todo => { todo.done = !todo.done })
+  largeTree.root.todos.forEach(todo => {
+    todo.done = !todo.done
+  })
 })
 
 benchmark.measure(`Arbor transactional mutation on Array(${arrayLength})`, () => {
-  largeTree.root.todos.transaction(todos => {
-    todos.forEach(todo => { todo.done = !todo.done })
+  largeTree.root.todos.$transaction(todos => {
+    todos.forEach(todo => {
+      todo.done = !todo.done
+    })
   })
+})
+
+benchmark.measure(`Arbor reverse Array(${arrayLength})`, () => {
+  largeTree.root.todos.reverse()
 })
 
 benchmark.measure(`Arbor sorting Array(${arrayLength})`, () => {

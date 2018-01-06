@@ -510,6 +510,66 @@ describe.only("Arbor", () => {
         ])
       })
     })
+
+    describe("#reverse", () => {
+      it("does not mutate original data", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const originalUsers = tree.root.users
+
+        tree.root.users.reverse()
+
+        expect(originalUsers).to.deep.eq([
+          { name: "Diego" },
+          { name: "Borges" },
+          { name: "Bianca" },
+        ])
+      })
+
+      it("reverses the array node items", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const reversed = tree.root.users.reverse()
+
+        expect(tree.root.users).to.deep.eq([
+          { name: "Bianca" },
+          { name: "Borges" },
+          { name: "Diego" },
+        ])
+      })
+
+      it("keeps array items' path in sync", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        warmupCache(tree)
+
+        tree.root.users.reverse()
+
+        expect(tree.root.users.map(user => user.$path.toString())).to.deep.eq([
+          "/users/0",
+          "/users/1",
+          "/users/2",
+        ])
+      })
+    })
   })
 
   describe("Model", () => {

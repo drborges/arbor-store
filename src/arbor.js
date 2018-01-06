@@ -224,6 +224,16 @@ export class ArrayNode extends Node {
     return length
   }
 
+  reverse() {
+    let reversed
+
+    this.$transaction(array => {
+      reversed = array.$refresh().$value.reverse()
+    })
+
+    return reversed
+  }
+
   $unpack() {
     return [ ...this.$value ]
   }
