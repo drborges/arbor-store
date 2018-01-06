@@ -41,7 +41,7 @@ const mutations = {
   },
 
   transaction: (fn) => (node, prop) => {
-    const child = node.refresh(prop)
+    const child = node.refreshChild(prop)
     node.$tree.transactions.push(child)
     fn(child)
     node.$tree.transactions.pop()
@@ -62,7 +62,7 @@ const mutate = (mutationPath, mutation, parent) => {
     mutation(parent, childProp)
 
   } else {
-    const child = parent.refresh(childProp)
+    const child = parent.refreshChild(childProp)
     mutate(mutationPath, mutation, child)
   }
 }
@@ -112,12 +112,12 @@ export class Node {
     return this.$tree.get(this.$path)
   }
 
-  refresh(prop) {
-    if (prop === undefined) {
-      this.$children = new WeakMap
-      return this
-    }
+  refresh() {
+    this.$children = new WeakMap
+    return this
+  }
 
+  refreshChild(prop) {
     const child = this[prop].copy()
     this.$value[prop] = child.$value
     this.$children.set(child.$value, child)
