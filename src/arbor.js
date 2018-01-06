@@ -214,6 +214,16 @@ export class ArrayNode extends Node {
     return shifted
   }
 
+  unshift(item) {
+    let length
+
+    this.$transaction(array => {
+      length = array.$refresh().$value.unshift(item)
+    })
+
+    return length
+  }
+
   $unpack() {
     return [ ...this.$value ]
   }

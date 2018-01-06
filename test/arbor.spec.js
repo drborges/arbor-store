@@ -447,6 +447,69 @@ describe.only("Arbor", () => {
         ])
       })
     })
+
+    describe("#unshift", () => {
+      it("does not mutate original data", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const originalUsers = tree.root.users
+
+        tree.root.users.unshift({ name: "new user" })
+
+        expect(originalUsers).to.deep.eq([
+          { name: "Diego" },
+          { name: "Borges" },
+          { name: "Bianca" },
+        ])
+      })
+
+      it("unshifts the array node", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const length = tree.root.users.unshift({ name: "new user" })
+
+        expect(length).to.eq(4)
+        expect(tree.root.users).to.deep.eq([
+          { name: "new user" },
+          { name: "Diego" },
+          { name: "Borges" },
+          { name: "Bianca" },
+        ])
+      })
+
+      it("keeps array items' path in sync", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        warmupCache(tree)
+
+        tree.root.users.unshift({ name: "new user" })
+
+        expect(tree.root.users.map(user => user.$path.toString())).to.deep.eq([
+          "/users/0",
+          "/users/1",
+          "/users/2",
+          "/users/3",
+        ])
+      })
+    })
   })
 
   describe("Model", () => {
