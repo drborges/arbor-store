@@ -32,7 +32,7 @@ class Stack {
  * Unpacks the proxied value if necessary
  */
 const unpack = (value) => value.$value !== undefined ?
-  value.unpack() :
+  value.$unpack() :
   value
 
 const mutations = {
@@ -41,7 +41,7 @@ const mutations = {
   },
 
   transaction: (fn) => (node, prop) => {
-    const child = node.refreshChild(prop)
+    const child = node.$refreshChild(prop)
     node.$tree.transactions.push(child)
     fn(child)
     node.$tree.transactions.pop()
@@ -62,7 +62,7 @@ const mutate = (mutationPath, mutation, parent) => {
     mutation(parent, childProp)
 
   } else {
-    const child = parent.refreshChild(childProp)
+    const child = parent.$refreshChild(childProp)
     mutate(mutationPath, mutation, child)
   }
 }
@@ -91,7 +91,7 @@ export class Node {
     }
 
     if (!this.$children.has(value)) {
-      this.createChild(prop, value)
+      this.$createChild(prop, value)
     }
 
     return this.$children.get(value)
@@ -107,30 +107,30 @@ export class Node {
     return true
   }
 
-  transaction(fn) {
+  $transaction(fn) {
     this.$tree.mutate(this.$path, mutations.transaction(fn))
     return this.$tree.get(this.$path)
   }
 
-  refresh() {
+  $refresh() {
     this.$children = new WeakMap
     return this
   }
 
-  refreshChild(prop) {
-    const child = this[prop].copy()
+  $refreshChild(prop) {
+    const child = this[prop].$copy()
     this.$value[prop] = child.$value
     this.$children.set(child.$value, child)
     return child
   }
 
-  createChild(prop, value) {
+  $createChild(prop, value) {
     const proxy = this.$tree.create(this.$path.child(prop), value)
     this.$children.set(value, proxy)
   }
 
-  copy() {
-    return this.$tree.create(this.$path, this.unpack(), this.$children)
+  $copy() {
+    return this.$tree.create(this.$path, this.$unpack(), this.$children)
   }
 
   get $transactionPath() {
@@ -139,27 +139,27 @@ export class Node {
 }
 
 export class ObjectNode extends Node {
-  unpack() {
+  $unpack() {
     return { ...this.$value }
   }
 }
 
 export class ArrayNode extends Node {
   sort(compare) {
-    return this.transaction(array => array.refresh().$value.sort(compare))
+    return this.$transaction(array => array.$refresh().$value.sort(compare))
   }
 
   splice(start, count, ...items) {
     let removed
 
-    this.transaction(array => {
-      removed = array.refresh().$value.splice(start, count, ...items)
+    this.$transaction(array => {
+      removed = array.$refresh().$value.splice(start, count, ...items)
     })
 
     return removed
   }
 
-  unpack() {
+  $unpack() {
     return [ ...this.$value ]
   }
 }
@@ -207,7 +207,7 @@ export default class Arbor {
 
       mutate(mutationPath, mutation, node)
     } else {
-      const root = this.root.copy()
+      const root = this.root.$copy()
       mutate(mutationPath, mutation, root)
       this.root = root
     }

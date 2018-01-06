@@ -45,7 +45,7 @@ describe.only("Arbor", () => {
         user: { name: "Diego" }
       })
 
-      tree.root.user.transaction(user => {
+      tree.root.user.$transaction(user => {
         user.name = "Borges"
         user.active = true
       })
@@ -126,7 +126,7 @@ describe.only("Arbor", () => {
         ]
       })
 
-      tree.root.users.transaction(users => {
+      tree.root.users.$transaction(users => {
         users.forEach(user => {
           user.age++
           user.active = true
@@ -407,7 +407,7 @@ describe.only("Arbor", () => {
     })
   })
 
-  context("transactions", () => {
+  context("$transactions", () => {
     it("supports nested (stacked) transactions", () => {
       const tree = new Arbor({
         users: [
@@ -416,7 +416,7 @@ describe.only("Arbor", () => {
         ]
       })
 
-      const users = tree.root.users.transaction(users => {
+      const users = tree.root.users.$transaction(users => {
         users[0].posts.sort((post1, post2) => post2.stars - post1.stars)
         users[1].posts.sort((post1, post2) => post2.stars - post1.stars)
         users[0].name = "drborges"
@@ -437,7 +437,7 @@ describe.only("Arbor", () => {
         ]
       })
 
-      const invalidTransaction = () => tree.root.users[0].transaction(user => {
+      const invalidTransaction = () => tree.root.users[0].$transaction(user => {
         tree.root.users[1].name = "borges"
       })
 
