@@ -3,7 +3,7 @@ import { expect } from "chai"
 
 import Arbor, { timetravel } from "../../src"
 
-describe("#timeline", () => {
+describe("timeline", () => {
   describe("#move", () => {
     it("moves back in time", () => {
       const store = timetravel(new Arbor({
