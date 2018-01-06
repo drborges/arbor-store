@@ -186,6 +186,10 @@ export class ObjectNode extends Node {
 }
 
 export class ArrayNode extends Node {
+  fill(item, start, end) {
+    return this.$transaction(array => array.$refresh().$value.fill(item, start, end))
+  }
+
   sort(compare) {
     return this.$transaction(array => array.$refresh().$value.sort(compare))
   }

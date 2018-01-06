@@ -570,6 +570,67 @@ describe.only("Arbor", () => {
         ])
       })
     })
+
+    describe("#fill", () => {
+      it("does not mutate original data", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const originalUsers = tree.root.users
+
+        tree.root.users.fill({ name: "new user" })
+
+        expect(originalUsers).to.deep.eq([
+          { name: "Diego" },
+          { name: "Borges" },
+          { name: "Bianca" },
+        ])
+      })
+
+      it("fills the array node with the given item", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const filled = tree.root.users.fill({ name: "new user" }, 1, 3)
+
+        expect(filled).to.eq(tree.root.users)
+        expect(filled).to.deep.eq([
+          { name: "Diego" },
+          { name: "new user" },
+          { name: "new user" },
+        ])
+      })
+
+      it("keeps array items' path in sync", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        warmupCache(tree)
+
+        tree.root.users.fill({ name: "new user" }, 1, 3)
+
+        expect(tree.root.users.map(user => user.$path.toString())).to.deep.eq([
+          "/users/0",
+          "/users/1",
+          "/users/1",
+        ])
+      })
+    })
   })
 
   describe("Model", () => {
