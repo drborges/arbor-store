@@ -91,8 +91,7 @@ export class Node {
     }
 
     if (!this.$children.has(value)) {
-      const proxy = this.$tree.create(this.$path.child(prop), value)
-      this.$children.set(value, proxy)
+      this.createChild(prop, value)
     }
 
     return this.$children.get(value)
@@ -125,6 +124,11 @@ export class Node {
     return child
   }
 
+  createChild(prop, value) {
+    const proxy = this.$tree.create(this.$path.child(prop), value)
+    this.$children.set(value, proxy)
+  }
+
   copy() {
     return this.$tree.create(this.$path, this.unpack(), this.$children)
   }
@@ -142,9 +146,7 @@ export class ObjectNode extends Node {
 
 export class ArrayNode extends Node {
   sort(compare) {
-    return this.transaction(array => {
-      return array.refresh().$value.sort(compare)
-    })
+    return this.transaction(array => array.refresh().$value.sort(compare))
   }
 
   splice(start, count, ...items) {
