@@ -682,6 +682,56 @@ describe.only("Arbor", () => {
       expect(tree.root.users[0].posts[0].title).to.eq("Nice!")
     })
 
+    it("auto binds target's methods", () => {
+      class Users {}
+
+      const tree = new Arbor({
+        users: [
+          { name: "Diego" },
+          { name: "Bianca" },
+        ]
+      })
+
+      tree.bind(Users).to("/users")
+      const reverse = tree.root.users.reverse
+
+      const reversed = reverse()
+
+      expect(reversed).to.deep.eq([
+        { name: "Bianca" },
+        { name: "Diego" },
+      ])
+    })
+
+    it("auto binds model's methods", () => {
+      class Users {
+        sortByName() {
+          return this.sort((user1, user2) => {
+            if (user1.name > user2.name) return 1
+            if (user1.name < user2.name) return -1
+            return 0
+          })
+        }
+      }
+
+      const tree = new Arbor({
+        users: [
+          { name: "Diego" },
+          { name: "Bianca" },
+        ]
+      })
+
+      tree.bind(Users).to("/users")
+      const sortByName = tree.root.users.sortByName
+
+      const sorted = sortByName()
+
+      expect(sorted).to.deep.eq([
+        { name: "Bianca" },
+        { name: "Diego" },
+      ])
+    })
+
     it("unpacks object value when assigning proxy", () => {
       class Post {}
 

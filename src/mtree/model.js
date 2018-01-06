@@ -5,9 +5,16 @@ const Model = (Target) => class Model extends Target {
   }
 
   get(target, prop) {
+    const targetValue = target[prop]
+
+    if (typeof targetValue === "function") {
+      return targetValue.bind(target)
+    }
+
     // Make sure getters are bound to the proxy, allowing them to access the
     // proxied data through 'this'.
     const thisValue = Reflect.get(this, prop, this.$proxy)
+
 
     // Make sure functions are always bound to the proxy even when passing them
     // around as reference, React example:
