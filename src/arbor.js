@@ -204,6 +204,16 @@ export class ArrayNode extends Node {
     return this.$transaction(array => array.$refresh().$value.copyWithin(target, start, end))
   }
 
+  shift() {
+    let shifted
+
+    this.$transaction(array => {
+      shifted = array.$refresh().$value.shift()
+    })
+
+    return shifted
+  }
+
   $unpack() {
     return [ ...this.$value ]
   }

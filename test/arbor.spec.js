@@ -387,6 +387,66 @@ describe.only("Arbor", () => {
         ])
       })
     })
+
+    describe("#shift", () => {
+      it("does not mutate original data", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const originalUsers = tree.root.users
+
+        tree.root.users.shift()
+
+        expect(originalUsers).to.deep.eq([
+          { name: "Diego" },
+          { name: "Borges" },
+          { name: "Bianca" },
+        ])
+      })
+
+      it("shifts the first item in the array node", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const user = tree.root.users.shift()
+
+        expect(user.constructor).to.eq(Object)
+        expect(user).to.deep.eq({ name: "Diego" })
+        expect(tree.root.users).to.deep.eq([
+          { name: "Borges" },
+          { name: "Bianca" },
+        ])
+      })
+
+      it("keeps array items' path in sync", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        warmupCache(tree)
+
+        tree.root.users.shift()
+
+        expect(tree.root.users.map(user => user.$path.toString())).to.deep.eq([
+          "/users/0",
+          "/users/1",
+        ])
+      })
+    })
   })
 
   describe("Model", () => {
