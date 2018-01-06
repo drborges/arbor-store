@@ -19,7 +19,7 @@ class Stack {
     this.items = []
   }
 
-  get peek() {
+  peek() {
     return this.items.slice(-1)[0]
   }
 
@@ -53,6 +53,19 @@ const isLeafNode = (value) =>
   value === null ||
   value.constructor !== Object &&
   value.constructor !== Array
+
+const mutate = (mutationPath, mutation, parent) => {
+  const childPath = mutationPath.subpath(parent.$path.depth + 1)
+  const childProp = childPath.leaf
+
+  if (childPath.match(mutationPath)) {
+    mutation(parent, childProp)
+
+  } else {
+    const child = parent.refresh(childProp)
+    mutate(mutationPath, mutation, child)
+  }
+}
 
 export class Node {
   constructor(tree, path, value, children = new WeakMap) {
@@ -114,6 +127,10 @@ export class Node {
 
   copy() {
     return this.$tree.create(this.$path, this.unpack(), this.$children)
+  }
+
+  get $transactionPath() {
+    return this.$path.child(".*")
   }
 }
 
@@ -179,27 +196,18 @@ export default class Arbor {
   }
 
   mutate(mutationPath, mutation) {
-    const node = this.transactions.peek
+    const node = this.transactions.peek()
 
     if (node) {
-      this.applyMutation(mutationPath, mutation, node)
+      if (!mutationPath.match(node.$transactionPath)) {
+        throw new TypeError("Mutation path does not belong to transaction subtree")
+      }
+
+      mutate(mutationPath, mutation, node)
     } else {
       const root = this.root.copy()
-      this.applyMutation(mutationPath, mutation, root)
+      mutate(mutationPath, mutation, root)
       this.root = root
-    }
-  }
-
-  applyMutation(mutationPath, mutation, parent) {
-    const childPath = mutationPath.subpath(parent.$path.depth + 1)
-    const childProp = childPath.leaf
-
-    if (childPath.match(mutationPath)) {
-      mutation(parent, childProp)
-
-    } else {
-      const child = parent.refresh(childProp)
-      this.applyMutation(mutationPath, mutation, child)
     }
   }
 }

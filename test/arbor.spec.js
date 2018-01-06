@@ -428,5 +428,20 @@ describe.only("Arbor", () => {
         { name: "Borges", posts: [{ stars: 10 }, { stars: 3 }]},
       ])
     })
+
+    it("throws an error when mutating node outside the transaction subtree", () => {
+      const tree = new Arbor({
+        users: [
+          { name: "Diego" },
+          { name: "Borges" },
+        ]
+      })
+
+      const invalidTransaction = () => tree.root.users[0].transaction(user => {
+        tree.root.users[1].name = "borges"
+      })
+
+      expect(invalidTransaction).to.throw()
+    })
   })
 })
