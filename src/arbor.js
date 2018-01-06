@@ -200,6 +200,10 @@ export class ArrayNode extends Node {
     return removed
   }
 
+  copyWithin(target, start, end) {
+    return this.$transaction(array => array.$refresh().$value.copyWithin(target, start, end))
+  }
+
   $unpack() {
     return [ ...this.$value ]
   }

@@ -178,7 +178,7 @@ describe.only("Arbor", () => {
       expect(tree.root.posts.$path.toString()).to.eq("/posts")
     })
 
-    describe("Array#sort", () => {
+    describe("#sort", () => {
       const compareUsers = (user1, user2) => {
         if (user1.name > user2.name) return 1
         if (user1.name < user2.name) return -1
@@ -253,7 +253,7 @@ describe.only("Arbor", () => {
       })
     })
 
-    describe("Array#splice", () => {
+    describe("#splice", () => {
       it("does not mutate original data", () => {
         const tree = new Arbor({
           users: [
@@ -318,6 +318,70 @@ describe.only("Arbor", () => {
         expect(tree.root.users.map(user => user.$path.toString())).to.deep.eq([
           "/users/0",
           "/users/1",
+          "/users/2",
+          "/users/3",
+        ])
+      })
+    })
+
+    describe("#copyWithin", () => {
+      it("does not mutate original data", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const originalUsers = tree.root.users
+
+        tree.root.users.copyWithin(1, 0, 2)
+
+        expect(originalUsers).to.deep.eq([
+          { name: "Diego" },
+          { name: "Borges" },
+          { name: "Bianca" },
+        ])
+      })
+
+      it("copies items within the array node", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+          ]
+        })
+
+        const users = tree.root.users.copyWithin(1, 0, 2)
+
+        expect(users).to.eq(tree.root.users)
+        expect(users).to.deep.eq([
+          { name: "Diego" },
+          { name: "Diego" },
+          { name: "Borges" },
+        ])
+      })
+
+      it("keeps array items' path in sync", () => {
+        const tree = new Arbor({
+          users: [
+            { name: "Diego" },
+            { name: "Borges" },
+            { name: "Bianca" },
+            { name: "Pacheco" },
+          ]
+        })
+
+        warmupCache(tree)
+
+        const users = tree.root.users.copyWithin(1, 0, 3)
+
+        expect(users[0]).to.eq(users[1])
+        expect(users.map(user => user.$path.toString())).to.deep.eq([
+          "/users/0",
+          "/users/0",
           "/users/2",
           "/users/3",
         ])
