@@ -6,23 +6,23 @@ class Benchmark {
 
   measure(name, fn) {
     let result
-    const executions = []
+    const samples = []
 
     for (let i = 0; i < this.sample; i++) {
       const executionStartTime = new Date().getTime()
       result = fn()
       const executionEndTime = new Date().getTime()
-      executions.push(executionEndTime - executionStartTime)
+      samples.push(executionEndTime - executionStartTime)
     }
 
-    executions.sort()
+    samples.sort()
 
     this.reports.push({
       name,
-      executions,
-      fastest: executions[0],
-      slowest: executions[executions.length - 1],
-      avg: executions.reduce((sum, next) => sum + next, 0) / executions.length
+      samples,
+      fastest: samples[0],
+      slowest: samples[samples.length - 1],
+      avg: samples.reduce((sum, next) => sum + next, 0) / samples.length
     })
 
     return result

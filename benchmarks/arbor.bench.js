@@ -49,4 +49,12 @@ benchmark.measure(`Arbor sorting Array(${arrayLength})`, () => {
   })
 })
 
-console.log(benchmark.reports)
+benchmark.reports.forEach(report => console.log(
+  `
+  name: ${report.name}
+  samples: ${report.samples.join(", ")}
+  fastest: ${report.fastest}
+  slowest: ${report.slowest}
+  avg: ${report.avg}
+  `
+))
