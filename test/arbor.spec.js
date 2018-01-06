@@ -1,7 +1,7 @@
 import sinon from "sinon"
 import { expect } from "chai"
 
-import Arbor, { Node } from "../src/arbor"
+import Arbor, { Node, ArrayNode, ObjectNode } from "../src/arbor"
 
 const warmupCache = (tree) => {
   tree.root.users.forEach(user => user.name)
@@ -81,6 +81,17 @@ describe.only("Arbor", () => {
       tree.root.post = tree.root.user.posts[0]
 
       expect(tree.root.post.$path.toString()).to.eq("/post")
+    })
+
+    it("destructuring", () => {
+      const tree = new Arbor({
+        user: { name: "Diego", posts: [{ title: "Sweet!" }] }
+      })
+
+      const { name, posts } = tree.root.user
+
+      expect(name).to.eq("Diego")
+      expect(posts.constructor).to.eq(ArrayNode)
     })
   })
 
@@ -630,6 +641,26 @@ describe.only("Arbor", () => {
           "/users/1",
         ])
       })
+    })
+
+    it("destructuring", () => {
+      const tree = new Arbor({
+        users: [
+          { name: "Diego" },
+          { name: "Borges" },
+          { name: "Bianca" },
+        ]
+      })
+
+      const [ head, ...tail ] = tree.root.users
+
+      expect(head.constructor).to.eq(ObjectNode)
+      expect(head).to.deep.eq({ name: "Diego" })
+      expect(tail.constructor).to.eq(Array)
+      expect(tail).to.deep.eq([
+        { name: "Borges" },
+        { name: "Bianca" },
+      ])
     })
   })
 
