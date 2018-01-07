@@ -5,6 +5,7 @@ import Arbor, { Node, ArrayNode, ObjectNode } from "../src"
 
 const warmupCache = (tree) => {
   tree.root.users.forEach(user => user.name)
+  return tree
 }
 
 describe("Arbor", () => {
@@ -238,15 +239,13 @@ describe("Arbor", () => {
       })
 
       it("keeps array items' path in sync", () => {
-        const tree = new Arbor({
+        const tree = warmupCache(new Arbor({
           users: [
             { name: "Diego" },
             { name: "Borges" },
             { name: "Bianca" },
           ]
-        })
-
-        warmupCache(tree)
+        }))
 
         const sorted = tree.root.users.sort(compareUsers)
 
@@ -304,15 +303,13 @@ describe("Arbor", () => {
       })
 
       it("keeps array items' path in sync", () => {
-        const tree = new Arbor({
+        const tree = warmupCache(new Arbor({
           users: [
             { name: "Diego" },
             { name: "Borges" },
             { name: "Bianca" },
           ]
-        })
-
-        warmupCache(tree)
+        }))
 
         const originalBianca = tree.root.users[2]
 
@@ -370,16 +367,14 @@ describe("Arbor", () => {
       })
 
       it("keeps array items' path in sync", () => {
-        const tree = new Arbor({
+        const tree = warmupCache(new Arbor({
           users: [
             { name: "Diego" },
             { name: "Borges" },
             { name: "Bianca" },
             { name: "Pacheco" },
           ]
-        })
-
-        warmupCache(tree)
+        }))
 
         const users = tree.root.users.copyWithin(1, 0, 3)
 
@@ -434,15 +429,13 @@ describe("Arbor", () => {
       })
 
       it("keeps array items' path in sync", () => {
-        const tree = new Arbor({
+        const tree = warmupCache(new Arbor({
           users: [
             { name: "Diego" },
             { name: "Borges" },
             { name: "Bianca" },
           ]
-        })
-
-        warmupCache(tree)
+        }))
 
         tree.root.users.shift()
 
@@ -495,15 +488,13 @@ describe("Arbor", () => {
       })
 
       it("keeps array items' path in sync", () => {
-        const tree = new Arbor({
+        const tree = warmupCache(new Arbor({
           users: [
             { name: "Diego" },
             { name: "Borges" },
             { name: "Bianca" },
           ]
-        })
-
-        warmupCache(tree)
+        }))
 
         tree.root.users.unshift({ name: "new user" })
 
@@ -556,15 +547,13 @@ describe("Arbor", () => {
       })
 
       it("keeps array items' path in sync", () => {
-        const tree = new Arbor({
+        const tree = warmupCache(new Arbor({
           users: [
             { name: "Diego" },
             { name: "Borges" },
             { name: "Bianca" },
           ]
-        })
-
-        warmupCache(tree)
+        }))
 
         tree.root.users.reverse()
 
@@ -617,15 +606,13 @@ describe("Arbor", () => {
       })
 
       it("keeps array items' path in sync", () => {
-        const tree = new Arbor({
+        const tree = warmupCache(new Arbor({
           users: [
             { name: "Diego" },
             { name: "Borges" },
             { name: "Bianca" },
           ]
-        })
-
-        warmupCache(tree)
+        }))
 
         tree.root.users.fill({ name: "new user" }, 1, 3)
 
