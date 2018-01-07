@@ -1,13 +1,13 @@
 export default class Registry {
-  registry = {}
+  models = {}
 
   fetch(path) {
-    const registeredPaths = Object.keys(this.registry)
+    const registeredPaths = Object.keys(this.models)
     const registeredPath = registeredPaths.find(registeredPath => path.match(registeredPath))
-    return this.registry[registeredPath]
+    return this.models[registeredPath]
   }
 
   register(path, Type) {
-    this.registry[path.toString()] = Type
+    this.models[path.toString()] = Type
   }
 }
