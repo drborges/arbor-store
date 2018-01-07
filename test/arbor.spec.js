@@ -18,12 +18,6 @@ describe("Arbor", () => {
     })
   })
 
-  describe("Node", () => {
-    it("is an abstract class and cannot be directly constructed", () => {
-      expect(() => new Node()).to.throw()
-    })
-  })
-
   describe("ObjectNode", () => {
     it("mutates object node", () => {
       const tree = new Arbor({

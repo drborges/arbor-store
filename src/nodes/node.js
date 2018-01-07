@@ -9,7 +9,7 @@ const isLeafNode = (value) =>
 /**
  * Unpacks the proxied value if necessary
  */
-const unpack = (value) => value.$value !== undefined ?
+const unpack = (value) => value && value.$value !== undefined ?
   value.$unpack() :
   value
 
@@ -50,7 +50,7 @@ export default class Node {
     }
 
     if (!this.$children.has(value)) {
-      this.$createChild(prop, value)
+      this.$children.set(value, this.$proxify(prop, value))
     }
 
     return this.$children.get(value)
@@ -58,7 +58,6 @@ export default class Node {
 
   set(target, prop, value) {
     this.$tree.mutate(this.$path.child(prop), mutations.set(value))
-
     return true
   }
 
@@ -79,9 +78,8 @@ export default class Node {
     return child
   }
 
-  $createChild(prop, value) {
-    const proxy = this.$tree.create(this.$path.child(prop), value)
-    this.$children.set(value, proxy)
+  $proxify(prop, value) {
+    return this.$tree.create(this.$path.child(prop), value)
   }
 
   $copy() {
