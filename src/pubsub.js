@@ -4,6 +4,11 @@ export default class PubSub {
   subscriptions = []
 
   subscribe(path, subscriber) {
+    if (typeof path === "function") {
+      subscriber = path
+      path = Path.root
+    }
+
     const subscription = { path, subscriber }
     this.subscriptions.push(subscription)
 

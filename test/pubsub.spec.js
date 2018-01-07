@@ -10,6 +10,20 @@ describe("PubSub", () => {
       const subscriber = sinon.spy()
       const pubsub = new PubSub
 
+      pubsub.subscribe(subscriber)
+
+      expect(pubsub.subscriptions).to.deep.eq([
+        {
+          path: Path.root,
+          subscriber: subscriber,
+        },
+      ])
+    })
+
+    it("registers a subscriber to a given path", () => {
+      const subscriber = sinon.spy()
+      const pubsub = new PubSub
+
       pubsub.subscribe("/users/:index", subscriber)
       pubsub.subscribe("/users/:index/posts/:index", subscriber)
 

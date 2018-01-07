@@ -24,11 +24,6 @@ export default class Arbor {
   }
 
   subscribe(path, subscriber) {
-    if (typeof path === "function") {
-      subscriber = path
-      path = Path.root
-    }
-
     return this.pubsub.subscribe(path, subscriber)
   }
 
