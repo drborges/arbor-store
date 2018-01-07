@@ -1,4 +1,4 @@
-const Arbor = require("../lib").Arbor
+const Arbor = require("../lib").default
 const Benchmark = require("./benchmark")
 
 const arrayWith = (length, itemFactory) => {
