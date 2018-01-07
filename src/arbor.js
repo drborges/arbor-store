@@ -48,8 +48,8 @@ export default class Arbor {
   }
 
   wrapped(proxy) {
-    const Model = this.models && this.models.fetch(proxy.$path)
-    return Model ? new Model(proxy) : proxy
+    const Type = this.models && this.models.fetch(proxy.$path)
+    return Type ? new Proxy(proxy, new Type(proxy)) : proxy
   }
 
   bind(Type) {

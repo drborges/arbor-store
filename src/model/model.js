@@ -1,7 +1,7 @@
 const Model = (Target) => class Model extends Target {
   constructor(node) {
     super()
-    return this.$proxy = new Proxy(node, this)
+    this.$proxy = new Proxy(node, this)
   }
 
   get(target, prop) {
