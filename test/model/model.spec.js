@@ -5,7 +5,7 @@ import { expect } from "chai"
 import Arbor from "../../src"
 
 describe("Model", () => {
-  it("wraps nodes within custom model classes", () => {
+  it("binds a custom model class to a given path within the tree", () => {
     class User {
       title = "Mr."
 
@@ -25,7 +25,29 @@ describe("Model", () => {
 
     tree.bind(User).to("/users/:index")
 
+    expect(tree.root.users[0].constructor).to.eq(User)
     expect(tree.root.users[0].formalName).to.eq("Mr. Diego")
+  })
+
+  it("binds a custom model class to multiple paths within the tree", () => {
+    class Person {}
+
+    const tree = new Arbor({
+      users: [
+        { name: "Diego", age: 32 },
+      ],
+      customers: [
+        { name: "Diego", age: 32 },
+      ],
+    })
+
+    tree.bind(Person).to(
+      "/users/:index",
+      "/customers/:index",
+    )
+
+    expect(tree.root.users[0].constructor).to.eq(Person)
+    expect(tree.root.customers[0].constructor).to.eq(Person)
   })
 
   it("triggers mutations from within custom model class", () => {
@@ -50,6 +72,7 @@ describe("Model", () => {
     tree.bind(Post).to("/users/:index/posts/:index")
     tree.root.users[0].posts[0].updateTitle("Nice!")
 
+    expect(tree.root.users[0].posts[0].constructor).to.eq(Post)
     expect(tree.root.users[0].posts[0].title).to.eq("Nice!")
   })
 

@@ -5,6 +5,10 @@ const Model = (Target) => class Model extends Target {
   }
 
   get(target, prop) {
+    if (prop === "constructor") {
+      return Target
+    }
+
     const targetValue = target[prop]
 
     if (typeof targetValue === "function") {
