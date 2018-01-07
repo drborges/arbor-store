@@ -56,8 +56,9 @@ export default class Arbor {
     const node = this.transactions.peek()
 
     if (node) {
-      if (!mutationPath.match(node.$transactionPath)) {
-        throw new TypeError("Mutation path does not belong to transaction subtree")
+      const transactionPath = node.$transactionPath
+      if (!mutationPath.match(transactionPath)) {
+        throw new TypeError(`Mutation path ${mutationPath.toString()} does not belong to transaction path ${transactionPath.toString()}`)
       }
 
       mutate(mutationPath, mutation, node)
