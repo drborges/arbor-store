@@ -13,10 +13,6 @@ export default class Cache {
     return this.items.has(key)
   }
 
-  delete(key) {
-    return this.items.delete(key)
-  }
-
   clear() {
     this.items = new WeakMap
   }
