@@ -1,6 +1,11 @@
 const Arbor = require("../lib").default
 const Benchmark = require("./benchmark")
 
+const warmupCache = (store) => {
+  store.state.todos.forEach(todo => todo.done)
+  return store
+}
+
 const arrayWith = (length, itemFactory) => {
   const arr = Array(length)
 
@@ -13,36 +18,46 @@ const arrayWith = (length, itemFactory) => {
 
 const arrayLength = 10000
 
-const largeTree = new Arbor({
+// Creates an Arbor store with its nodes' caches warmed up so that first access
+// caching times aren't included in the mutation overall time.
+const largeStore = warmupCache(new Arbor({
   todos: arrayWith(arrayLength, (i) => ({ done: false })),
-})
+}))
 
 const benchmark = new Benchmark({ sample: 10 })
 
-benchmark.measure(`Redux-like mutation on Array(${arrayLength})`, () => {
+benchmark.measure(`Redux-like mutation on all items within Array(${arrayLength})`, () => {
   const copy = arrayWith(arrayLength, (i) => ({ done: false })).map(todo => ({ done: !todo.done }))
 })
 
-benchmark.measure(`Arbor mutation on Array(${arrayLength})`, () => {
-  largeTree.root.todos.forEach(todo => {
+benchmark.measure(`Arbor mutate a single item within Array(${arrayLength})`, () => {
+  largeStore.state.todos[100].done = !largeStore.state.todos[100].done
+})
+
+benchmark.measure(`Arbor mutate all items within Array(${arrayLength})`, () => {
+  largeStore.state.todos.forEach(todo => {
     todo.done = !todo.done
   })
 })
 
-benchmark.measure(`Arbor transactional mutation on Array(${arrayLength})`, () => {
-  largeTree.root.todos.$transaction(todos => {
-    todos.forEach(todo => {
-      todo.done = !todo.done
-    })
+benchmark.measure(`Arbor transactional mutation on a single item within Array(${arrayLength})`, () => {
+  largeStore.state.todos.$transaction(todos => {
+    todos[100].done = !todos[100].done
+  })
+})
+
+benchmark.measure(`Arbor transactional mutation on all items within Array(${arrayLength})`, () => {
+  largeStore.state.todos.$transaction(todos => {
+    todos.forEach(todo => { todo.done = !todo.done })
   })
 })
 
 benchmark.measure(`Arbor reverse Array(${arrayLength})`, () => {
-  largeTree.root.todos.reverse()
+  largeStore.state.todos.reverse()
 })
 
 benchmark.measure(`Arbor sorting Array(${arrayLength})`, () => {
-  largeTree.root.todos.sort((todo1, todo2) => {
+  largeStore.state.todos.sort((todo1, todo2) => {
     if (todo1.done) return 1
     if (todo2.done) return -1
     return 0
