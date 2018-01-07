@@ -27,10 +27,6 @@ export default class Arbor {
     return this.pubsub.subscribe(path, subscriber)
   }
 
-  get(path) {
-    return path.traverse(this.root)
-  }
-
   create(path, value, children) {
     const node = createNode(this, path, value, children)
     return this.wrapped(new Proxy(value, node))

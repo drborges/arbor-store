@@ -63,7 +63,7 @@ export default class Node {
 
   $transaction(fn) {
     this.$tree.mutate(this.$path, mutations.transaction(fn))
-    return this.$tree.get(this.$path)
+    return this.$path.traverse(this.$tree.root)
   }
 
   $refresh() {
