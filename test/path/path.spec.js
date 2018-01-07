@@ -1,5 +1,5 @@
 import { expect } from "chai"
-import Path from "../src/path"
+import Path from "../../src/path"
 
 describe("Path", () => {
   describe("#toString", () => {

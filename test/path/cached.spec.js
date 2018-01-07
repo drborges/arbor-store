@@ -1,7 +1,7 @@
 import sinon from "sinon"
 import { expect } from "chai"
 
-import cached from "../src/path/cached"
+import cached from "../../src/path/cached"
 
 describe("@cached", () => {
 
