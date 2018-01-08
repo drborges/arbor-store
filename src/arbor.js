@@ -58,7 +58,7 @@ export default class Arbor {
     if (node) {
       const transactionPath = node.$transactionPath
       if (!mutationPath.match(transactionPath)) {
-        throw new TypeError(`Mutation path ${mutationPath.toString()} does not belong to transaction path ${transactionPath.toString()}`)
+        throw new TypeError(`Mutation path ${mutationPath} does not belong to transaction path ${transactionPath}`)
       }
 
       mutate(mutationPath, mutation, node)
