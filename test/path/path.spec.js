@@ -1,5 +1,5 @@
 import { expect } from "chai"
-import { Path } from "../../src/ptree"
+import Path from "../../src/path"
 
 describe("Path", () => {
   describe("#toString", () => {
@@ -49,6 +49,13 @@ describe("Path", () => {
 
       expect(path1.match(path2)).to.be.false
     })
+
+    it("matches a given wildcard path", () => {
+      const path1 = new Path("users", "0", "comments", "1")
+      const path2 = new Path("users", ":index", "comments", ":index")
+
+      expect(path1.match(path2)).to.be.true
+    })
   })
 
   describe("#parse", () => {
@@ -79,7 +86,7 @@ describe("Path", () => {
       const path = new Path("users", "0", "comments", "1")
       const store = {
         users: [
-          { name: "diego", comments: [{ text: "LoL" }, { text: "Nice!" }]},
+          { name: "jon", comments: [{ text: "LoL" }, { text: "Nice!" }]},
           { name: "Bianca", comments: []},
         ]
       }
@@ -90,11 +97,11 @@ describe("Path", () => {
     it("traverses an array", () => {
       const path = new Path("0", "name")
       const users = [
-        { name: "diego", comments: [{ text: "LoL" }, { text: "Nice!" }]},
+        { name: "jon", comments: [{ text: "LoL" }, { text: "Nice!" }]},
         { name: "Bianca", comments: []},
       ]
 
-      expect(path.traverse(users)).to.equal("diego")
+      expect(path.traverse(users)).to.equal("jon")
     })
   })
 

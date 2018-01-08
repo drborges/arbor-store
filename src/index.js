@@ -1,5 +1,5 @@
-import Store from "./store"
+import Arbor from "./arbor"
 
-export default Store
-export MTree from "./mtree"
+export default Arbor
+export * from "./nodes"
 export timetravel from "./timetravel"

@@ -1,10 +1,8 @@
 import Timeline from "./timeline"
 
-const timetravel = (Store) => class extends Store {
-  constructor(initialState, options) {
-    super(initialState, options)
-    this.timeline = new Timeline(this)
-  }
+const timetravel = (store) => {
+  store.timeline = new Timeline(store)
+  return store
 }
 
 export default timetravel
