@@ -15,7 +15,7 @@ class Benchmark {
       samples.push(executionEndTime - executionStartTime)
     }
 
-    samples.sort()
+    samples.sort((time1, time2) => time1 - time2)
 
     this.reports.push({
       name,
