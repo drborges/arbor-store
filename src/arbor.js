@@ -16,7 +16,7 @@ const mutate = (mutationPath, mutation, parent) => {
 }
 
 export default class Arbor {
-  constructor(state) {
+  constructor(state = {}) {
     this.pubsub = new PubSub
     this.models = new Registry
     this.transactions = new Stack
@@ -73,5 +73,14 @@ export default class Arbor {
 
   get state() {
     return this.root
+  }
+
+  set state(rootValue) {
+    if (rootValue.constructor === Promise) {
+      this.root = this.create(new Path, {})
+      rootValue.then(state => this.restore(this.create(new Path, state)))
+    } else {
+      this.root = this.create(new Path, rootValue)
+    }
   }
 }

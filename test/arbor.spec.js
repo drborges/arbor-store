@@ -19,6 +19,22 @@ describe("Arbor", () => {
     })
   })
 
+  it("creates a tree with async initial state", (done) => {
+    const state = { user: { name: "Jon" }}
+    const promisedState = new Promise(resolve => setTimeout(() => resolve(state), 5))
+    const tree = new Arbor
+
+    tree.state = promisedState
+
+    tree.subscribe((newState, oldState) => {
+      expect(tree.root).to.eq(newState)
+      expect(newState).to.deep.eq(state)
+      expect(oldState).to.deep.eq({})
+
+      done()
+    })
+  })
+
   describe("ObjectNode", () => {
     it("mutates object node", () => {
       const tree = new Arbor({
