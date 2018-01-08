@@ -17,7 +17,7 @@ describe("Model", () => {
     const tree = new Arbor({
       users: [
         {
-          name: "Diego",
+          name: "Jon",
           age: 32,
         },
       ]
@@ -26,7 +26,7 @@ describe("Model", () => {
     tree.bind(User).to("/users/:index")
 
     expect(tree.root.users[0].constructor).to.eq(User)
-    expect(tree.root.users[0].formalName).to.eq("Mr. Diego")
+    expect(tree.root.users[0].formalName).to.eq("Mr. Jon")
   })
 
   it("binds a custom model class to multiple paths within the tree", () => {
@@ -34,10 +34,10 @@ describe("Model", () => {
 
     const tree = new Arbor({
       users: [
-        { name: "Diego", age: 32 },
+        { name: "Jon", age: 32 },
       ],
       customers: [
-        { name: "Diego", age: 32 },
+        { name: "Jon", age: 32 },
       ],
     })
 
@@ -60,7 +60,7 @@ describe("Model", () => {
     const tree = new Arbor({
       users: [
         {
-          name: "Diego",
+          name: "Jon",
           age: 32,
           posts: [
             { title: "Sweet!" },
@@ -81,7 +81,7 @@ describe("Model", () => {
 
     const tree = new Arbor({
       users: [
-        { name: "Diego" },
+        { name: "Jon" },
         { name: "Bianca" },
       ]
     })
@@ -93,7 +93,7 @@ describe("Model", () => {
 
     expect(reversed).to.deep.eq([
       { name: "Bianca" },
-      { name: "Diego" },
+      { name: "Jon" },
     ])
   })
 
@@ -110,7 +110,7 @@ describe("Model", () => {
 
     const tree = new Arbor({
       users: [
-        { name: "Diego" },
+        { name: "Jon" },
         { name: "Bianca" },
       ]
     })
@@ -122,7 +122,7 @@ describe("Model", () => {
 
     expect(sorted).to.deep.eq([
       { name: "Bianca" },
-      { name: "Diego" },
+      { name: "Jon" },
     ])
   })
 
@@ -130,7 +130,7 @@ describe("Model", () => {
     class Post {}
 
     const tree = new Arbor({
-      user: { name: "Diego", posts: [{ title: "Sweet!" }] }
+      user: { name: "Jon", posts: [{ title: "Sweet!" }] }
     })
 
     tree.bind(Post).to("/users/:index/posts/:index")
@@ -146,7 +146,7 @@ describe("Model", () => {
     class Posts {}
 
     const tree = new Arbor({
-      user: { name: "Diego", posts: [{ title: "Sweet!" }] }
+      user: { name: "Jon", posts: [{ title: "Sweet!" }] }
     })
 
     tree.bind(Posts).to("/users/:index/posts")

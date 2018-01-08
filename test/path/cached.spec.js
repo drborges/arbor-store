@@ -22,18 +22,18 @@ describe("@cached", () => {
   }
 
   it("caches person instances by name", () => {
-    const person1 = new Person("Diego", 31)
-    const person2 = new Person("Diego", 32)
-    const person3 = new Person("Dieg", 31)
+    const person1 = new Person("Jon", 31)
+    const person2 = new Person("Jon", 32)
+    const person3 = new Person("Snow", 31)
 
     expect(person1).to.equal(person2)
     expect(person1).to.not.equal(person3)
   })
 
   it("caches employee instances by email", () => {
-    const employee1 = new Employee("Diego", "drborges.cic@gmail.com")
-    const employee2 = new Employee("Diego", "drborges.cic@gmail.com")
-    const employee3 = new Employee("Diego", "drborges@gmail.com")
+    const employee1 = new Employee("Jon", "jon@gmail.com")
+    const employee2 = new Employee("Snow", "jon@gmail.com")
+    const employee3 = new Employee("Stark", "stark@gmail.com")
 
     expect(employee1).to.equal(employee2)
     expect(employee1).to.not.equal(employee3)

@@ -11,55 +11,55 @@ const warmupCache = (tree) => {
 describe("Arbor", () => {
   it("creates a tree for the given initial state", () => {
     const tree = new Arbor({
-      user: { name: "Diego" }
+      user: { name: "Jon" }
     })
 
     expect(tree.root).to.deep.eq({
-      user: { name: "Diego" }
+      user: { name: "Jon" }
     })
   })
 
   describe("ObjectNode", () => {
     it("mutates object node", () => {
       const tree = new Arbor({
-        user: { name: "Diego" }
+        user: { name: "Jon" }
       })
 
       const originalUser = tree.root.user
 
-      tree.root.user = { name: "Borges" }
+      tree.root.user = { name: "Snow" }
 
-      expect(originalUser).to.deep.eq({ name: "Diego" })
+      expect(originalUser).to.deep.eq({ name: "Jon" })
       expect(tree.root).to.deep.eq({
-        user: { name: "Borges" }
+        user: { name: "Snow" }
       })
     })
 
     it("mutates object node within a transaction", () => {
       const tree = new Arbor({
-        user: { name: "Diego" }
+        user: { name: "Jon" }
       })
 
       tree.root.user.$transaction(user => {
-        user.name = "Borges"
+        user.name = "Snow"
         user.active = true
       })
 
       expect(tree.root).to.deep.eq({
-        user: { name: "Borges", active: true }
+        user: { name: "Snow", active: true }
       })
     })
 
     it("applies structural sharing", () => {
       const tree = new Arbor({
-        user: { name: "Diego", posts: [{ title: "Sweet!" }] }
+        user: { name: "Jon", posts: [{ title: "Sweet!" }] }
       })
 
       const originalRoot = tree.root
       const originalUser = tree.root.user
       const originalPosts = tree.root.user.posts
 
-      tree.root.user.name = "Borges"
+      tree.root.user.name = "Snow"
 
       expect(originalRoot).to.not.eq(tree.root)
       expect(originalUser).to.not.eq(tree.root.user)
@@ -68,7 +68,7 @@ describe("Arbor", () => {
 
     it("unpacks value when assigning proxy", () => {
       const tree = new Arbor({
-        user: { name: "Diego", posts: [{ title: "Sweet!" }] }
+        user: { name: "Jon", posts: [{ title: "Sweet!" }] }
       })
 
       expect(tree.root.user.posts[0].$path.toString()).to.eq("/user/posts/0")
@@ -80,12 +80,12 @@ describe("Arbor", () => {
 
     it("destructuring", () => {
       const tree = new Arbor({
-        user: { name: "Diego", posts: [{ title: "Sweet!" }] }
+        user: { name: "Jon", posts: [{ title: "Sweet!" }] }
       })
 
       const { name, posts } = tree.root.user
 
-      expect(name).to.eq("Diego")
+      expect(name).to.eq("Jon")
       expect(posts.constructor).to.eq(ArrayNode)
     })
   })
@@ -93,16 +93,16 @@ describe("Arbor", () => {
   describe("ArrayNode", () => {
     it("mutates array node", () => {
       const tree = new Arbor({
-        users: [{ name: "Diego" }]
+        users: [{ name: "Jon" }]
       })
 
       const originalUsers = tree.root.users
 
-      tree.root.users = [...originalUsers, { name: "Borges" }]
+      tree.root.users = [...originalUsers, { name: "Snow" }]
 
-      expect(originalUsers).to.deep.eq([{ name: "Diego" }])
+      expect(originalUsers).to.deep.eq([{ name: "Jon" }])
       expect(tree.root).to.deep.eq({
-        users: [{ name: "Diego" }, { name: "Borges" }]
+        users: [{ name: "Jon" }, { name: "Snow" }]
       })
     })
 
@@ -127,7 +127,7 @@ describe("Arbor", () => {
     it("mutates all array items within a transaction", () => {
       const tree = new Arbor({
         users: [
-          { name: "Diego", age: 32 },
+          { name: "Jon", age: 32 },
           { name: "Bianca", age: 24 },
         ]
       })
@@ -140,7 +140,7 @@ describe("Arbor", () => {
       })
 
       expect(tree.root.users).to.deep.eq([
-        { name: "Diego", age: 33, active: true },
+        { name: "Jon", age: 33, active: true },
         { name: "Bianca", age: 25, active: true },
       ])
     })
@@ -148,7 +148,7 @@ describe("Arbor", () => {
     it("applies structural sharing", () => {
       const tree = new Arbor({
         user: {
-          name: "Diego",
+          name: "Jon",
           posts: [
             { title: "Sweet!" },
             { title: "Nice!" },
@@ -174,7 +174,7 @@ describe("Arbor", () => {
 
     it("unpacks value when assigning proxy", () => {
       const tree = new Arbor({
-        user: { name: "Diego", posts: [{ title: "Sweet!" }] }
+        user: { name: "Jon", posts: [{ title: "Sweet!" }] }
       })
 
       expect(tree.root.user.posts.$path.toString()).to.eq("/user/posts")
@@ -194,8 +194,8 @@ describe("Arbor", () => {
       it("does not mutate original data", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -206,8 +206,8 @@ describe("Arbor", () => {
 
         expect(sorted).to.not.deep.eq(originalUsers)
         expect(originalUsers).to.deep.eq([
-          { name: "Diego" },
-          { name: "Borges" },
+          { name: "Jon" },
+          { name: "Snow" },
           { name: "Bianca" },
         ])
       })
@@ -215,8 +215,8 @@ describe("Arbor", () => {
       it("sorts the array node", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -227,22 +227,16 @@ describe("Arbor", () => {
 
         expect(sorted).to.deep.eq([
           { name: "Bianca" },
-          { name: "Borges" },
-          { name: "Diego" },
-        ])
-
-        expect(tree.root.users).to.deep.eq([
-          { name: "Bianca" },
-          { name: "Borges" },
-          { name: "Diego" },
+          { name: "Jon" },
+          { name: "Snow" },
         ])
       })
 
       it("keeps array items' path in sync", () => {
         const tree = warmupCache(new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         }))
@@ -261,8 +255,8 @@ describe("Arbor", () => {
       it("does not mutate original data", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -272,8 +266,8 @@ describe("Arbor", () => {
         tree.root.users.splice(1, 1, { name: "Alice" }, { name: "Bob" })
 
         expect(originalUsers).to.deep.eq([
-          { name: "Diego" },
-          { name: "Borges" },
+          { name: "Jon" },
+          { name: "Snow" },
           { name: "Bianca" },
         ])
       })
@@ -281,8 +275,8 @@ describe("Arbor", () => {
       it("splices the array node", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -291,11 +285,11 @@ describe("Arbor", () => {
 
         expect(removed).to.be.an.instanceof(Object)
         expect(removed).to.deep.eq([
-          { name: "Borges" },
+          { name: "Snow" },
         ])
 
         expect(tree.root.users).to.deep.eq([
-          { name: "Diego" },
+          { name: "Jon" },
           { name: "Alice" },
           { name: "Bob" },
           { name: "Bianca" },
@@ -305,8 +299,8 @@ describe("Arbor", () => {
       it("keeps array items' path in sync", () => {
         const tree = warmupCache(new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         }))
@@ -330,8 +324,8 @@ describe("Arbor", () => {
       it("does not mutate original data", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -341,8 +335,8 @@ describe("Arbor", () => {
         tree.root.users.copyWithin(1, 0, 2)
 
         expect(originalUsers).to.deep.eq([
-          { name: "Diego" },
-          { name: "Borges" },
+          { name: "Jon" },
+          { name: "Snow" },
           { name: "Bianca" },
         ])
       })
@@ -350,8 +344,8 @@ describe("Arbor", () => {
       it("copies items within the array node", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -360,17 +354,17 @@ describe("Arbor", () => {
 
         expect(users).to.eq(tree.root.users)
         expect(users).to.deep.eq([
-          { name: "Diego" },
-          { name: "Diego" },
-          { name: "Borges" },
+          { name: "Jon" },
+          { name: "Jon" },
+          { name: "Snow" },
         ])
       })
 
       it("keeps array items' path in sync", () => {
         const tree = warmupCache(new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
             { name: "Pacheco" },
           ]
@@ -392,8 +386,8 @@ describe("Arbor", () => {
       it("does not mutate original data", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -403,8 +397,8 @@ describe("Arbor", () => {
         tree.root.users.shift()
 
         expect(originalUsers).to.deep.eq([
-          { name: "Diego" },
-          { name: "Borges" },
+          { name: "Jon" },
+          { name: "Snow" },
           { name: "Bianca" },
         ])
       })
@@ -412,8 +406,8 @@ describe("Arbor", () => {
       it("shifts the first item in the array node", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -421,9 +415,9 @@ describe("Arbor", () => {
         const user = tree.root.users.shift()
 
         expect(user.constructor).to.eq(Object)
-        expect(user).to.deep.eq({ name: "Diego" })
+        expect(user).to.deep.eq({ name: "Jon" })
         expect(tree.root.users).to.deep.eq([
-          { name: "Borges" },
+          { name: "Snow" },
           { name: "Bianca" },
         ])
       })
@@ -431,8 +425,8 @@ describe("Arbor", () => {
       it("keeps array items' path in sync", () => {
         const tree = warmupCache(new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         }))
@@ -450,8 +444,8 @@ describe("Arbor", () => {
       it("does not mutate original data", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -461,8 +455,8 @@ describe("Arbor", () => {
         tree.root.users.unshift({ name: "new user" })
 
         expect(originalUsers).to.deep.eq([
-          { name: "Diego" },
-          { name: "Borges" },
+          { name: "Jon" },
+          { name: "Snow" },
           { name: "Bianca" },
         ])
       })
@@ -470,8 +464,8 @@ describe("Arbor", () => {
       it("unshifts the array node", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -481,8 +475,8 @@ describe("Arbor", () => {
         expect(length).to.eq(4)
         expect(tree.root.users).to.deep.eq([
           { name: "new user" },
-          { name: "Diego" },
-          { name: "Borges" },
+          { name: "Jon" },
+          { name: "Snow" },
           { name: "Bianca" },
         ])
       })
@@ -490,8 +484,8 @@ describe("Arbor", () => {
       it("keeps array items' path in sync", () => {
         const tree = warmupCache(new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         }))
@@ -511,8 +505,8 @@ describe("Arbor", () => {
       it("does not mutate original data", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -522,8 +516,8 @@ describe("Arbor", () => {
         tree.root.users.reverse()
 
         expect(originalUsers).to.deep.eq([
-          { name: "Diego" },
-          { name: "Borges" },
+          { name: "Jon" },
+          { name: "Snow" },
           { name: "Bianca" },
         ])
       })
@@ -531,8 +525,8 @@ describe("Arbor", () => {
       it("reverses the array node items", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -541,16 +535,16 @@ describe("Arbor", () => {
 
         expect(tree.root.users).to.deep.eq([
           { name: "Bianca" },
-          { name: "Borges" },
-          { name: "Diego" },
+          { name: "Snow" },
+          { name: "Jon" },
         ])
       })
 
       it("keeps array items' path in sync", () => {
         const tree = warmupCache(new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         }))
@@ -569,8 +563,8 @@ describe("Arbor", () => {
       it("does not mutate original data", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -580,8 +574,8 @@ describe("Arbor", () => {
         tree.root.users.fill({ name: "new user" })
 
         expect(originalUsers).to.deep.eq([
-          { name: "Diego" },
-          { name: "Borges" },
+          { name: "Jon" },
+          { name: "Snow" },
           { name: "Bianca" },
         ])
       })
@@ -589,8 +583,8 @@ describe("Arbor", () => {
       it("fills the array node with the given item", () => {
         const tree = new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         })
@@ -599,7 +593,7 @@ describe("Arbor", () => {
 
         expect(filled).to.eq(tree.root.users)
         expect(filled).to.deep.eq([
-          { name: "Diego" },
+          { name: "Jon" },
           { name: "new user" },
           { name: "new user" },
         ])
@@ -608,8 +602,8 @@ describe("Arbor", () => {
       it("keeps array items' path in sync", () => {
         const tree = warmupCache(new Arbor({
           users: [
-            { name: "Diego" },
-            { name: "Borges" },
+            { name: "Jon" },
+            { name: "Snow" },
             { name: "Bianca" },
           ]
         }))
@@ -627,8 +621,8 @@ describe("Arbor", () => {
     it("destructuring", () => {
       const tree = new Arbor({
         users: [
-          { name: "Diego" },
-          { name: "Borges" },
+          { name: "Jon" },
+          { name: "Snow" },
           { name: "Bianca" },
         ]
       })
@@ -636,10 +630,10 @@ describe("Arbor", () => {
       const [ head, ...tail ] = tree.root.users
 
       expect(head.constructor).to.eq(ObjectNode)
-      expect(head).to.deep.eq({ name: "Diego" })
+      expect(head).to.deep.eq({ name: "Jon" })
       expect(tail.constructor).to.eq(Array)
       expect(tail).to.deep.eq([
-        { name: "Borges" },
+        { name: "Snow" },
         { name: "Bianca" },
       ])
     })
@@ -649,34 +643,34 @@ describe("Arbor", () => {
     it("supports nested (stacked) transactions", () => {
       const tree = new Arbor({
         users: [
-          { name: "Diego", posts: [{ stars: 1 }, { stars: 2 }]},
-          { name: "Borges", posts: [{ stars: 3 }, { stars: 10 }]},
+          { name: "Jon", posts: [{ stars: 1 }, { stars: 2 }]},
+          { name: "Snow", posts: [{ stars: 3 }, { stars: 10 }]},
         ]
       })
 
       const users = tree.root.users.$transaction(users => {
         users[0].posts.sort((post1, post2) => post2.stars - post1.stars)
         users[1].posts.sort((post1, post2) => post2.stars - post1.stars)
-        users[0].name = "drborges"
+        users[0].name = "stark"
       })
 
       expect(users).to.eq(tree.root.users)
       expect(users).to.deep.eq([
-        { name: "drborges", posts: [{ stars: 2 }, { stars: 1 }]},
-        { name: "Borges", posts: [{ stars: 10 }, { stars: 3 }]},
+        { name: "stark", posts: [{ stars: 2 }, { stars: 1 }]},
+        { name: "Snow", posts: [{ stars: 10 }, { stars: 3 }]},
       ])
     })
 
     it("throws an error when mutating node outside the transaction subtree", () => {
       const tree = new Arbor({
         users: [
-          { name: "Diego" },
-          { name: "Borges" },
+          { name: "Jon" },
+          { name: "Snow" },
         ]
       })
 
       const invalidTransaction = () => tree.root.users[0].$transaction(user => {
-        tree.root.users[1].name = "borges"
+        tree.root.users[1].name = "snow"
       })
 
       expect(invalidTransaction).to.throw()
@@ -686,61 +680,61 @@ describe("Arbor", () => {
   describe("#subscribe", () => {
     it("subscribes to any mutation", () => {
       const tree = new Arbor({
-        user: { name: "Diego" }
+        user: { name: "Jon" }
       })
 
       tree.subscribe((newState, oldState) => {
         expect(oldState).to.deep.eq({
-          user: { name: "Diego" }
+          user: { name: "Jon" }
         })
 
         expect(newState).to.deep.eq({
-          user: { name: "Borges" }
+          user: { name: "Snow" }
         })
       })
 
-      tree.root.user.name = "Borges"
+      tree.root.user.name = "Snow"
     })
 
     it("subscribes to mutations to a particular path", (done) => {
       const tree = new Arbor({
-        user: { name: "Diego" }
+        user: { name: "Jon" }
       })
 
       tree.subscribe("/user/name", (newName, oldName) => {
-        expect(oldName).to.eq("Diego")
-        expect(newName).to.eq("Borges")
+        expect(oldName).to.eq("Jon")
+        expect(newName).to.eq("Snow")
         done()
       })
 
-      tree.root.user.name = "Borges"
+      tree.root.user.name = "Snow"
     })
 
     it("subscribes to mutations to a wildcard path", (done) => {
       const tree = new Arbor({
-        users: [{ name: "Bob" }, { name: "Diego" }]
+        users: [{ name: "Bob" }, { name: "Jon" }]
       })
 
       tree.subscribe("/users/:index/name", (newName, oldName) => {
-        expect(oldName).to.eq("Diego")
-        expect(newName).to.eq("Borges")
+        expect(oldName).to.eq("Jon")
+        expect(newName).to.eq("Snow")
         done()
       })
 
-      tree.root.users[1].name = "Borges"
+      tree.root.users[1].name = "Snow"
     })
 
     it("unsubscribes from mutation notifications", () => {
       const subscriber = sinon.spy()
 
       const tree = new Arbor({
-        users: [{ name: "Bob" }, { name: "Diego" }]
+        users: [{ name: "Bob" }, { name: "Jon" }]
       })
 
       const unsubscribe = tree.subscribe(subscriber)
       unsubscribe()
 
-      tree.root.users[1].name = "Borges"
+      tree.root.users[1].name = "Snow"
 
       expect(subscriber).to.not.have.been.called
     })

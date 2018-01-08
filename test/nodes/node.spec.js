@@ -14,7 +14,7 @@ describe("Node", () => {
   describe("#set", () => {
     it("assigns a primitive value to the node", () => {
       const tree = new Arbor({
-        user: { name: "Diego" },
+        user: { name: "Jon" },
       })
 
       tree.root.user = "some data"
@@ -24,7 +24,7 @@ describe("Node", () => {
 
     it("assigns an undefined value to the node", () => {
       const tree = new Arbor({
-        user: { name: "Diego" },
+        user: { name: "Jon" },
       })
 
       tree.root.user = undefined
@@ -34,7 +34,7 @@ describe("Node", () => {
 
     it("assigns a null value to the node", () => {
       const tree = new Arbor({
-        user: { name: "Diego" },
+        user: { name: "Jon" },
       })
 
       tree.root.user = null
@@ -44,7 +44,7 @@ describe("Node", () => {
 
     it("assigns an object value to the node", () => {
       const tree = new Arbor({
-        user: { name: "Diego" },
+        user: { name: "Jon" },
       })
 
       tree.root.user = { name: "Bob" }
@@ -54,7 +54,7 @@ describe("Node", () => {
 
     it("assigns an array value to the node", () => {
       const tree = new Arbor({
-        user: { name: "Diego" },
+        user: { name: "Jon" },
       })
 
       tree.root.user = [ "Bob" ]
@@ -64,7 +64,7 @@ describe("Node", () => {
 
     it("assigns an arbor node value to the node", () => {
       const tree = new Arbor({
-        users: [{ name: "Diego" }, { name: "Borges" }],
+        users: [{ name: "Jon" }, { name: "Snow" }],
       })
 
       const firstUser = tree.root.users[0]
@@ -83,7 +83,7 @@ describe("Node", () => {
     it("returns raw value when accessing leaf nodes", () => {
       const state = {
         user: {
-          name: "Diego",
+          name: "Jon",
           age: 32,
           password: null,
           dob: new Date(1980, 1, 1),
@@ -101,7 +101,7 @@ describe("Node", () => {
     })
 
     it("caches tree node upon first access", () => {
-      const state = { users: [{ name: "Diego" }, { name: "Borges" }] }
+      const state = { users: [{ name: "Jon" }, { name: "Snow" }] }
       const tree = new Arbor(state)
 
       expect(tree.root.$children.has(state.users)).to.be.false
@@ -123,7 +123,7 @@ describe("Node", () => {
 
   describe("#$refresh", () => {
     it("refreshes node cache", () => {
-      const state = { user: { name: "Diego" } }
+      const state = { user: { name: "Jon" } }
       const tree = new Arbor(state)
 
       tree.root.user
@@ -139,7 +139,7 @@ describe("Node", () => {
 
   describe("#$refreshChild", () => {
     it("replaces child with a copy", () => {
-      const state = { user: { name: "Diego" } }
+      const state = { user: { name: "Jon" } }
       const tree = new Arbor(state)
 
       const originalUser = tree.root.user
@@ -156,7 +156,7 @@ describe("Node", () => {
 
   describe("#$transactionPath", () => {
     it("constructs a trnasaction path for a given node", () => {
-      const tree = new Arbor({ user: { name: "Diego" } })
+      const tree = new Arbor({ user: { name: "Jon" } })
 
       expect(tree.root.user.$transactionPath.toString()).to.eq("/user/.*")
     })
@@ -164,7 +164,7 @@ describe("Node", () => {
 
   describe("#$copy", () => {
     it("creates a copy of the node", () => {
-      const tree = new Arbor({ users: [{ name: "Diego" }] })
+      const tree = new Arbor({ users: [{ name: "Jon" }] })
 
       const originalUsers = tree.root.users
       const copy = originalUsers.$copy()
@@ -180,8 +180,8 @@ describe("Node", () => {
 
   describe("#proxify", () => {
     it("creates a new child node", () => {
-      const tree = new Arbor({ users: [{ name: "Diego" }] })
-      const value = { name: "Borges" }
+      const tree = new Arbor({ users: [{ name: "Jon" }] })
+      const value = { name: "Snow" }
       const proxy = tree.root.users.$proxify(1, value)
 
       expect(proxy.constructor).to.eq(ObjectNode)

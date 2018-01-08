@@ -86,7 +86,7 @@ describe("Path", () => {
       const path = new Path("users", "0", "comments", "1")
       const store = {
         users: [
-          { name: "diego", comments: [{ text: "LoL" }, { text: "Nice!" }]},
+          { name: "jon", comments: [{ text: "LoL" }, { text: "Nice!" }]},
           { name: "Bianca", comments: []},
         ]
       }
@@ -97,11 +97,11 @@ describe("Path", () => {
     it("traverses an array", () => {
       const path = new Path("0", "name")
       const users = [
-        { name: "diego", comments: [{ text: "LoL" }, { text: "Nice!" }]},
+        { name: "jon", comments: [{ text: "LoL" }, { text: "Nice!" }]},
         { name: "Bianca", comments: []},
       ]
 
-      expect(path.traverse(users)).to.equal("diego")
+      expect(path.traverse(users)).to.equal("jon")
     })
   })
 

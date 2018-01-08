@@ -8,7 +8,7 @@ describe("timeline", () => {
     it("moves back in time", () => {
       const store = timetravel(new Arbor({
         user: {
-          name: "Diego",
+          name: "Jon",
           age: 32,
         }
       }))
@@ -33,14 +33,14 @@ describe("timeline", () => {
       store.timeline.travel.step(-1)
 
       expect(store.state.user).to.deep.eq({
-        name: "Diego",
+        name: "Jon",
         age: 32,
       })
 
       store.timeline.travel.step(-1)
 
       expect(store.state.user).to.deep.eq({
-        name: "Diego",
+        name: "Jon",
         age: 32,
       })
     })
@@ -48,7 +48,7 @@ describe("timeline", () => {
     it("moves forward in time", () => {
       const store = timetravel(new Arbor({
         user: {
-          name: "Diego",
+          name: "Jon",
           age: 32,
         }
       }))
@@ -86,7 +86,7 @@ describe("timeline", () => {
     it("moves to an especific point in time", () => {
       const store = timetravel(new Arbor({
         user: {
-          name: "Diego",
+          name: "Jon",
           age: 32,
         }
       }))
@@ -107,7 +107,7 @@ describe("timeline", () => {
     it("does not move time out of its boundaries", () => {
       const store = timetravel(new Arbor({
         user: {
-          name: "Diego",
+          name: "Jon",
           age: 32,
         }
       }))
@@ -131,7 +131,7 @@ describe("timeline", () => {
     it("moves to the beginning of time", () => {
       const store = timetravel(new Arbor({
         user: {
-          name: "Diego",
+          name: "Jon",
           age: 32,
         }
       }))
@@ -144,7 +144,7 @@ describe("timeline", () => {
       store.timeline.travel.origin()
 
       expect(store.state.user).to.deep.eq({
-        name: "Diego",
+        name: "Jon",
         age: 32,
       })
     })
@@ -154,7 +154,7 @@ describe("timeline", () => {
     it("moves time to the present state", () => {
       const store = timetravel(new Arbor({
         user: {
-          name: "Diego",
+          name: "Jon",
           age: 32,
         }
       }))
@@ -178,7 +178,7 @@ describe("timeline", () => {
     it("turns timetravel on", () => {
       const store = timetravel(new Arbor({
         user: {
-          name: "Diego",
+          name: "Jon",
           age: 32,
         }
       }))
@@ -197,7 +197,7 @@ describe("timeline", () => {
     it("turns timetravel off", () => {
       const store = timetravel(new Arbor({
         user: {
-          name: "Diego",
+          name: "Jon",
           age: 32,
         }
       }))
@@ -216,7 +216,7 @@ describe("timeline", () => {
     it("one can still travel through time when timetravel is off", () => {
       const store = timetravel(new Arbor({
         user: {
-          name: "Diego",
+          name: "Jon",
           age: 32,
         }
       }))
@@ -229,7 +229,7 @@ describe("timeline", () => {
 
       store.timeline.travel.origin()
 
-      expect(store.state.user.name).to.eq("Diego")
+      expect(store.state.user.name).to.eq("Jon")
     })
   })
 })
