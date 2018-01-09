@@ -76,7 +76,7 @@ Model classes may be used to represent specific nodes within the State Tree. Tak
 ```js
 import Arbor from "arbor-store"
 
-const store = new Arbor<App>({
+const store = new Arbor({
   users: [],
   board: {
     todos: [],
