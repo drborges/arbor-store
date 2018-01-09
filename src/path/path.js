@@ -55,10 +55,4 @@ export default class Path {
   get depth() {
     return this.nodes.length
   }
-
-  *[Symbol.iterator]() {
-    for (const node of this.nodes) {
-      yield node
-    }
-  }
 }
