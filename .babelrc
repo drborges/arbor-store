@@ -1,11 +1,10 @@
 {
-    "presets": ["env"],
+  "presets": ["env"],
   "plugins": [
     "transform-class-properties",
     "transform-export-extensions",
     "transform-decorators-legacy",
     "transform-object-rest-spread",
-    "transform-es2015-computed-properties",
-    ["transform-runtime", { "polyfill": false }]
+    "transform-es2015-computed-properties"
   ]
 }

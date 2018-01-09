@@ -105,25 +105,6 @@ describe("Path", () => {
     })
   })
 
-  describe("@@iterator", () => {
-    it("implements the iterator protocol", () => {
-      const nodes = []
-      const path = new Path("users", "0", "name")
-
-      for (const node of path) {
-        nodes.push(node)
-      }
-
-      expect(nodes).to.deep.equal(["users", "0", "name"])
-    })
-
-    it("desctructs path into nodes", () => {
-      const [head, ...tail] = new Path("users", "0", "name")
-      expect(head).to.equal("users")
-      expect(tail).to.deep.equal(["0", "name"])
-    })
-  })
-
   describe("#subpath", () => {
     it("retrieves subpaths from a given path", () => {
       const path = new Path("users", 0, "name")
