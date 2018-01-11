@@ -20,19 +20,16 @@ describe("Arbor", () => {
   })
 
   it("creates a tree with async initial state", (done) => {
+    const subscriber = sinon.spy(() => done())
     const state = { user: { name: "Jon" }}
-    const promisedState = new Promise(resolve => setTimeout(() => resolve(state), 5))
+    const promisedState = new Promise(resolve => resolve(state))
     const tree = new Arbor
 
     tree.state = promisedState
+    tree.subscribe(subscriber)
 
-    tree.subscribe((newState, oldState) => {
-      expect(tree.root).to.eq(newState)
-      expect(newState).to.deep.eq(state)
-      expect(oldState).to.deep.eq({})
-
-      done()
-    })
+    expect(subscriber).to.have.been.calledWith({}, {})
+    expect(subscriber).to.have.been.calledWith(state, {})
   })
 
   describe("ObjectNode", () => {
@@ -695,35 +692,28 @@ describe("Arbor", () => {
 
   describe("#subscribe", () => {
     it("subscribes to any mutation", () => {
+      const subscriber = sinon.spy()
       const tree = new Arbor({
         user: { name: "Jon" }
       })
 
-      tree.subscribe((newState, oldState) => {
-        expect(oldState).to.deep.eq({
-          user: { name: "Jon" }
-        })
-
-        expect(newState).to.deep.eq({
-          user: { name: "Snow" }
-        })
-      })
-
+      tree.subscribe(subscriber)
       tree.root.user.name = "Snow"
+
+      expect(subscriber).to.have.been.calledWith({ user: { name: "Jon" }}, { user: { name: "Jon" }})
+      expect(subscriber).to.have.been.calledWith({ user: { name: "Snow" }}, { user: { name: "Jon" }})
     })
 
     it("subscribes to mutations to a particular path", (done) => {
+      const subscriber = sinon.spy(() => done())
       const tree = new Arbor({
         user: { name: "Jon" }
       })
 
-      tree.subscribe("/user/name", (newName, oldName) => {
-        expect(oldName).to.eq("Jon")
-        expect(newName).to.eq("Snow")
-        done()
-      })
-
+      tree.subscribe("/user/name", subscriber)
       tree.root.user.name = "Snow"
+
+      expect(subscriber).to.have.been.calledWith("Snow", "Jon")
     })
 
     it("subscribes to mutations to a wildcard path", (done) => {
@@ -752,7 +742,8 @@ describe("Arbor", () => {
 
       tree.root.users[1].name = "Snow"
 
-      expect(subscriber).to.not.have.been.called
+      expect(subscriber).to.have.been.calledWith({ users: [{ name: "Bob" }, { name: "Jon" }]}, { users: [{ name: "Bob" }, { name: "Jon" }]})
+      expect(subscriber).to.have.not.been.calledWith({ user: { name: "Snow" }}, { user: { name: "Jon" }})
     })
   })
 })

@@ -24,7 +24,9 @@ export default class Arbor {
   }
 
   subscribe(path, subscriber) {
-    return this.pubsub.subscribe(path, subscriber)
+    const unsubscribe = this.pubsub.subscribe(path, subscriber)
+    this.pubsub.publish(Path.root, this.root, this.root)
+    return unsubscribe
   }
 
   create(path, value, children) {
