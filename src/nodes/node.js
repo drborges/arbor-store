@@ -1,10 +1,11 @@
 import Cache from "./cache"
 
-const isLeafNode = (value) =>
-  value === undefined ||
-  value === null ||
-  value.constructor !== Object &&
-  value.constructor !== Array
+const proxiable = (value) =>
+  value !== undefined &&
+  value !== null && (
+    value.constructor === Object ||
+    value.constructor === Array
+  )
 
 /**
  * Unpacks the proxied value if necessary
@@ -39,21 +40,22 @@ export default class Node {
   }
 
   get(target, prop) {
-    const value = target[prop]
+    const targetValue = Reflect.get(target, prop)
+    const nodeValue = Reflect.get(this, prop)
 
-    if (this[prop]) {
-      return this[prop]
+    if (nodeValue !== undefined) {
+      return nodeValue
     }
 
-    if (isLeafNode(value)) {
-      return value
+    if (!proxiable(targetValue)) {
+      return targetValue
     }
 
-    if (!this.$children.has(value)) {
-      this.$children.set(value, this.$proxify(prop, value))
+    if (!this.$children.has(targetValue)) {
+      this.$children.set(targetValue, this.$proxify(prop, targetValue))
     }
 
-    return this.$children.get(value)
+    return this.$children.get(targetValue)
   }
 
   set(target, prop, value) {
