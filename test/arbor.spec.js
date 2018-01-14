@@ -388,7 +388,7 @@ describe("Arbor", () => {
         expect(users[0]).to.eq(users[1])
         expect(users.map(user => user.$path.toString())).to.deep.eq([
           "/users/0",
-          "/users/0",
+          "/users/1",
           "/users/2",
           "/users/3",
         ])
@@ -626,7 +626,7 @@ describe("Arbor", () => {
         expect(tree.root.users.map(user => user.$path.toString())).to.deep.eq([
           "/users/0",
           "/users/1",
-          "/users/1",
+          "/users/2",
         ])
       })
     })

@@ -1,5 +1,3 @@
-import Cache from "./cache"
-
 const proxiable = (value) =>
   value !== undefined &&
   value !== null && (
@@ -28,7 +26,7 @@ const mutations = {
 }
 
 export default class Node {
-  constructor(tree, path, value, children = new Cache) {
+  constructor(tree, path, value) {
     if (this.constructor === Node) {
       throw new TypeError("Node is an abstract class and must be subclassed")
     }
@@ -36,7 +34,6 @@ export default class Node {
     this.$tree = tree
     this.$path = path
     this.$value = value
-    this.$children = children
   }
 
   get(target, prop) {
@@ -51,15 +48,24 @@ export default class Node {
       return targetValue
     }
 
-    if (!this.$children.has(targetValue)) {
-      this.$children.set(targetValue, this.$proxify(prop, targetValue))
+    const childPath = this.$path.child(prop)
+    if (!this.$tree.nodes.has(targetValue)) {
+      const child = this.$tree.create(childPath, targetValue)
+      this.$tree.nodes.set(targetValue, child)
     }
 
-    return this.$children.get(targetValue)
+    const child = this.$tree.nodes.get(targetValue)
+    child.$path = childPath
+    return child
   }
 
   set(target, prop, value) {
-    this.$tree.mutate(this.$path.child(prop), mutations.set(value))
+    if (this[prop]) {
+      this[prop] = value
+    } else {
+      this.$tree.mutate(this.$path.child(prop), mutations.set(value))
+    }
+
     return true
   }
 
@@ -68,24 +74,15 @@ export default class Node {
     return this.$path.traverse(this.$tree.root)
   }
 
-  $refresh() {
-    this.$children.clear()
-    return this
-  }
-
   $refreshChild(prop) {
     const child = this[prop].$copy()
     this.$value[prop] = child.$value
-    this.$children.set(child.$value, child)
+    this.$tree.nodes.set(child.$value, child)
     return child
   }
 
-  $proxify(prop, value) {
-    return this.$tree.create(this.$path.child(prop), value)
-  }
-
   $copy() {
-    return this.$tree.create(this.$path, this.$unpack(), this.$children)
+    return this.$tree.create(this.$path, this.$unpack())
   }
 
   get $transactionPath() {

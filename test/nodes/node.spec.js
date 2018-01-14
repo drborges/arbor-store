@@ -1,7 +1,6 @@
 import sinon from "sinon"
 import { expect } from "chai"
 
-import Cache from "../../src/nodes/cache"
 import Arbor, { Node, ArrayNode, ObjectNode } from "../../src"
 
 describe("Node", () => {
@@ -104,36 +103,20 @@ describe("Node", () => {
       const state = { users: [{ name: "Jon" }, { name: "Snow" }] }
       const tree = new Arbor(state)
 
-      expect(tree.root.$children.has(state.users)).to.be.false
+      expect(tree.nodes.has(state.users)).to.be.false
 
       tree.root.users
 
-      expect(tree.root.$children.has(state.users)).to.be.true
+      expect(tree.nodes.has(state.users)).to.be.true
 
-      expect(tree.root.users.$children.has(state.users[0])).to.be.false
-      expect(tree.root.users.$children.has(state.users[1])).to.be.false
+      expect(tree.nodes.has(state.users[0])).to.be.false
+      expect(tree.nodes.has(state.users[1])).to.be.false
 
       tree.root.users[0]
       tree.root.users[1]
 
-      expect(tree.root.users.$children.has(state.users[0])).to.be.true
-      expect(tree.root.users.$children.has(state.users[1])).to.be.true
-    })
-  })
-
-  describe("#$refresh", () => {
-    it("refreshes node cache", () => {
-      const state = { user: { name: "Jon" } }
-      const tree = new Arbor(state)
-
-      tree.root.user
-
-      expect(tree.root.$children.has(state.user)).to.be.true
-
-      const node = tree.root.$refresh()
-
-      expect(node).to.eq(tree.root)
-      expect(tree.root.$children.has(state.user)).to.be.false
+      expect(tree.nodes.has(state.users[0])).to.be.true
+      expect(tree.nodes.has(state.users[1])).to.be.true
     })
   })
 
@@ -175,20 +158,6 @@ describe("Node", () => {
       expect(originalUsers.$value).to.not.eq(copy.$value)
       expect(originalUsers.$value).to.deep.eq(copy.$value)
       expect(originalUsers.$children).to.eq(copy.$children)
-    })
-  })
-
-  describe("#proxify", () => {
-    it("creates a new child node", () => {
-      const tree = new Arbor({ users: [{ name: "Jon" }] })
-      const value = { name: "Snow" }
-      const proxy = tree.root.users.$proxify(1, value)
-
-      expect(proxy.constructor).to.eq(ObjectNode)
-      expect(proxy.$tree).to.eq(tree)
-      expect(proxy.$path.toString()).to.eq("/users/1")
-      expect(proxy.$value).to.eq(value)
-      expect(proxy.$children).to.be.an.instanceof(Cache)
     })
   })
 })

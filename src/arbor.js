@@ -19,6 +19,7 @@ export default class Arbor {
   constructor(state = {}) {
     this.pubsub = new PubSub
     this.models = new Registry
+    this.nodes = new WeakMap
     this.transactions = new Stack
     this.root = this.create(new Path, state)
   }
@@ -29,8 +30,8 @@ export default class Arbor {
     return unsubscribe
   }
 
-  create(path, value, children) {
-    const node = createNode(this, path, value, children)
+  create(path, value) {
+    const node = createNode(this, path, value)
     return this.wrapped(new Proxy(value, node))
   }
 

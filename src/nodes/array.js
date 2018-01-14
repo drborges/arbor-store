@@ -3,13 +3,13 @@ import Node from "./node"
 export default class ArrayNode extends Node {
   fill(item, start, end) {
     return this.$transaction(array => {
-      array.$refresh().$value.fill(item, start, end)
+      array.$value.fill(item, start, end)
     })
   }
 
   sort(compare) {
     return this.$transaction(array => {
-      array.$refresh().$value.sort(compare)
+      array.$value.sort(compare)
     })
   }
 
@@ -17,7 +17,7 @@ export default class ArrayNode extends Node {
     let removed
 
     this.$transaction(array => {
-      removed = array.$refresh().$value.splice(start, count, ...items)
+      removed = array.$value.splice(start, count, ...items)
     })
 
     return removed
@@ -25,7 +25,7 @@ export default class ArrayNode extends Node {
 
   copyWithin(target, start, end) {
     return this.$transaction(array => {
-      array.$refresh().$value.copyWithin(target, start, end)
+      array.$value.copyWithin(target, start, end)
     })
   }
 
@@ -33,7 +33,7 @@ export default class ArrayNode extends Node {
     let shifted
 
     this.$transaction(array => {
-      shifted = array.$refresh().$value.shift()
+      shifted = array.$value.shift()
     })
 
     return shifted
@@ -43,7 +43,7 @@ export default class ArrayNode extends Node {
     let length
 
     this.$transaction(array => {
-      length = array.$refresh().$value.unshift(item)
+      length = array.$value.unshift(item)
     })
 
     return length
@@ -53,7 +53,7 @@ export default class ArrayNode extends Node {
     let reversed
 
     this.$transaction(array => {
-      reversed = array.$refresh().$value.reverse()
+      reversed = array.$value.reverse()
     })
 
     return reversed
