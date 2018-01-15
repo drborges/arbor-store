@@ -10,7 +10,7 @@ describe("PubSub", () => {
       const subscriber = sinon.spy()
       const pubsub = new PubSub
 
-      pubsub.subscribe(subscriber)
+      pubsub.subscribe(Path.root, subscriber)
 
       expect(pubsub.subscriptions).to.deep.eq([
         {

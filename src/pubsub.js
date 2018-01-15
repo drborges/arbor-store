@@ -4,11 +4,6 @@ export default class PubSub {
   subscriptions = []
 
   subscribe(path, subscriber) {
-    if (typeof path === "function") {
-      subscriber = path
-      path = Path.root
-    }
-
     const subscription = { path, subscriber }
     this.subscriptions.push(subscription)
 
@@ -17,12 +12,14 @@ export default class PubSub {
     }
   }
 
-  publish(mutationPath, newRoot, oldRoot) {
+  publish(mutationPath, newRoot, oldRoot = null) {
     this.subscriptions.forEach(({ path, subscriber }) => {
       if (path === Path.root) {
         subscriber(newRoot, oldRoot)
       } else if (mutationPath.match(path)) {
-        subscriber(mutationPath.traverse(newRoot), mutationPath.traverse(oldRoot))
+        const newValue = newRoot ? mutationPath.traverse(newRoot) : newRoot
+        const oldValue = oldRoot ? mutationPath.traverse(oldRoot) : oldRoot
+        subscriber(newValue, oldValue)
       }
     })
   }

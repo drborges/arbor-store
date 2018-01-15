@@ -25,8 +25,18 @@ export default class Arbor {
   }
 
   subscribe(path, subscriber) {
-    const unsubscribe = this.pubsub.subscribe(path, subscriber)
-    this.pubsub.publish(Path.root, this.root, this.root)
+    if (typeof path === "function") {
+      subscriber = path
+      path = Path.root
+    }
+
+    const resolvedPath = Path.resolve(path)
+    const unsubscribe = this.pubsub.subscribe(resolvedPath, subscriber)
+
+    if (path === Path.root) {
+      this.pubsub.publish(resolvedPath, this.root)
+    }
+
     return unsubscribe
   }
 

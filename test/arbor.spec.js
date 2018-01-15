@@ -691,6 +691,17 @@ describe("Arbor", () => {
   })
 
   describe("#subscribe", () => {
+    it("Root subscribers are notified with current state upon subscription", () => {
+      const subscriber = sinon.spy()
+      const tree = new Arbor({
+        user: { name: "Jon" }
+      })
+
+      tree.subscribe(subscriber)
+
+      expect(subscriber).to.have.been.calledWith({ user: { name: "Jon" }}, null)
+    })
+
     it("subscribes to any mutation", () => {
       const subscriber = sinon.spy()
       const tree = new Arbor({
@@ -700,12 +711,12 @@ describe("Arbor", () => {
       tree.subscribe(subscriber)
       tree.root.user.name = "Snow"
 
-      expect(subscriber).to.have.been.calledWith({ user: { name: "Jon" }}, { user: { name: "Jon" }})
+      expect(subscriber).to.have.been.calledWith({ user: { name: "Jon" }}, null)
       expect(subscriber).to.have.been.calledWith({ user: { name: "Snow" }}, { user: { name: "Jon" }})
     })
 
-    it("subscribes to mutations to a particular path", (done) => {
-      const subscriber = sinon.spy(() => done())
+    it("subscribes to mutations to a particular path", () => {
+      const subscriber = sinon.spy()
       const tree = new Arbor({
         user: { name: "Jon" }
       })
@@ -713,37 +724,38 @@ describe("Arbor", () => {
       tree.subscribe("/user/name", subscriber)
       tree.root.user.name = "Snow"
 
+      expect(subscriber).to.have.been.calledOnce
       expect(subscriber).to.have.been.calledWith("Snow", "Jon")
     })
 
-    it("subscribes to mutations to a wildcard path", (done) => {
+    it("subscribes to mutations to a wildcard path", () => {
+      const subscriber = sinon.spy()
       const tree = new Arbor({
         users: [{ name: "Bob" }, { name: "Jon" }]
       })
 
-      tree.subscribe("/users/:index/name", (newName, oldName) => {
-        expect(oldName).to.eq("Jon")
-        expect(newName).to.eq("Snow")
-        done()
-      })
+      tree.subscribe("/users/:index/name", subscriber)
 
       tree.root.users[1].name = "Snow"
+
+      expect(subscriber).to.have.been.calledOnce
+      expect(subscriber).to.have.been.calledWith("Snow", "Jon")
     })
 
     it("unsubscribes from mutation notifications", () => {
       const subscriber = sinon.spy()
 
       const tree = new Arbor({
-        users: [{ name: "Bob" }, { name: "Jon" }]
+        user: { name: "Jon" }
       })
 
       const unsubscribe = tree.subscribe(subscriber)
       unsubscribe()
 
-      tree.root.users[1].name = "Snow"
+      tree.root.user.name = "Snow"
 
-      expect(subscriber).to.have.been.calledWith({ users: [{ name: "Bob" }, { name: "Jon" }]}, { users: [{ name: "Bob" }, { name: "Jon" }]})
-      expect(subscriber).to.have.not.been.calledWith({ user: { name: "Snow" }}, { user: { name: "Jon" }})
+      expect(subscriber).to.have.been.calledOnce
+      expect(subscriber).to.have.been.calledWith({ user: { name: "Jon" }}, null)
     })
   })
 })
