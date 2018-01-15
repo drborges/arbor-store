@@ -15,13 +15,15 @@ const unpack = (value) => value && value.$value !== undefined ?
 const mutations = {
   set: (value) => (node, prop) => {
     node.$value[prop] = unpack(value)
+    return node
   },
 
   transaction: (fn) => (node, prop) => {
     const child = node.$refreshChild(prop)
     node.$tree.transactions.push(child)
-    fn(child)
+    const result = fn(child)
     node.$tree.transactions.pop()
+    return result
   }
 }
 
@@ -70,8 +72,7 @@ export default class Node {
   }
 
   $transaction(fn) {
-    this.$tree.mutate(this.$path, mutations.transaction(fn))
-    return this.$path.traverse(this.$tree.root)
+    return this.$tree.mutate(this.$path, mutations.transaction(fn))
   }
 
   $refreshChild(prop) {

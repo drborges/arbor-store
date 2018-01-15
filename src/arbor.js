@@ -8,11 +8,9 @@ const mutate = (mutationPath, mutation, parent) => {
   const childPath = mutationPath.subpath(parent.$path.depth + 1)
   const childProp = childPath.leaf
 
-  if (childPath.match(mutationPath)) {
-    mutation(parent, childProp)
-  } else {
+  return childPath.match(mutationPath) ?
+    mutation(parent, childProp) :
     mutate(mutationPath, mutation, parent.$refreshChild(childProp))
-  }
 }
 
 export default class Arbor {
@@ -78,9 +76,10 @@ export default class Arbor {
     } else {
       const oldRoot = this.root
       const newRoot = this.root.$copy()
-      mutate(mutationPath, mutation, newRoot)
+      const node = mutate(mutationPath, mutation, newRoot)
       this.root = newRoot
       this.pubsub.publish(mutationPath, newRoot, oldRoot)
+      return node
     }
   }
 

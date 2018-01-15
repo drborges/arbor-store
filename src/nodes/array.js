@@ -4,59 +4,38 @@ export default class ArrayNode extends Node {
   fill(item, start, end) {
     return this.$transaction(array => {
       array.$value.fill(item, start, end)
+      return array
     })
   }
 
   sort(compare) {
     return this.$transaction(array => {
       array.$value.sort(compare)
+      return array
     })
   }
 
   splice(start, count, ...items) {
-    let removed
-
-    this.$transaction(array => {
-      removed = array.$value.splice(start, count, ...items)
-    })
-
-    return removed
+    return this.$transaction(array => array.$value.splice(start, count, ...items))
   }
 
   copyWithin(target, start, end) {
     return this.$transaction(array => {
       array.$value.copyWithin(target, start, end)
+      return array
     })
   }
 
   shift() {
-    let shifted
-
-    this.$transaction(array => {
-      shifted = array.$value.shift()
-    })
-
-    return shifted
+    return this.$transaction(array => array.$value.shift())
   }
 
   unshift(item) {
-    let length
-
-    this.$transaction(array => {
-      length = array.$value.unshift(item)
-    })
-
-    return length
+    return this.$transaction(array => array.$value.unshift(item))
   }
 
   reverse() {
-    let reversed
-
-    this.$transaction(array => {
-      reversed = array.$value.reverse()
-    })
-
-    return reversed
+    return this.$transaction(array => array.$value.reverse())
   }
 
   $unpack() {

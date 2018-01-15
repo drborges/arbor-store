@@ -665,6 +665,7 @@ describe("Arbor", () => {
         users[0].posts.sort((post1, post2) => post2.stars - post1.stars)
         users[1].posts.sort((post1, post2) => post2.stars - post1.stars)
         users[0].name = "stark"
+        return users
       })
 
       expect(users).to.eq(tree.root.users)
