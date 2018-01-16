@@ -668,7 +668,7 @@ describe("Arbor", () => {
         return users
       })
 
-      expect(users).to.eq(tree.root.users)
+      expect(users).to.not.eq(tree.root.users)
       expect(users).to.deep.eq([
         { name: "stark", posts: [{ stars: 2 }, { stars: 1 }]},
         { name: "Snow", posts: [{ stars: 10 }, { stars: 3 }]},

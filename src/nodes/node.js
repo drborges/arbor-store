@@ -5,6 +5,35 @@ const proxiable = (value) =>
     value.constructor === Array
   )
 
+const createMutator = (data) => new Proxy(data, {
+  $unpack() {
+    return data
+  },
+
+  get(target, prop, receiver) {
+    const value = Reflect.get(target, prop, receiver)
+
+    if (typeof value === "function") {
+      return value.bind(target)
+    }
+
+    if (!proxiable(value)) {
+      return value
+    }
+
+    target[prop] = Array.isArray(value) ?
+      [...value] :
+      {...value}
+
+    return createMutator(target[prop])
+  },
+
+  set(target, prop, value) {
+    target[prop] = unpack(value)
+    return true
+  }
+})
+
 /**
  * Unpacks the proxied value if necessary
  */
@@ -19,9 +48,9 @@ const mutations = {
   },
 
   transaction: (fn) => (node, prop) => {
-    const child = node.$refreshChild(prop)
-    node.$tree.transactions.push(child)
-    const result = fn(child)
+    node.$tree.transactions.push(node[prop])
+    const mutator = createMutator(node.$value)
+    const result = fn(createMutator(mutator[prop]))
     node.$tree.transactions.pop()
     return result
   }
@@ -84,6 +113,10 @@ export default class Node {
 
   $copy() {
     return this.$tree.create(this.$path, this.$unpack())
+  }
+
+  $refresh() {
+    return this.$path.traverse(this.$tree.root)
   }
 
   get $transactionPath() {
