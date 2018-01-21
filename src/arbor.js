@@ -1,5 +1,4 @@
 import Path from "./path"
-import Stack from "./stack"
 import PubSub from "./pubsub"
 import createNode from "./nodes"
 import Model, { Registry } from "./model"
@@ -18,7 +17,7 @@ export default class Arbor {
     this.pubsub = new PubSub
     this.models = new Registry
     this.nodes = new WeakMap
-    this.transactions = new Stack
+    this.mutationTarget = null
     this.root = this.create(new Path, state)
   }
 
@@ -64,23 +63,16 @@ export default class Arbor {
   }
 
   mutate(mutationPath, mutation) {
-    const node = this.transactions.peek()
-
-    if (node) {
-      const transactionPath = node.$transactionPath
-      if (!mutationPath.match(transactionPath)) {
-        throw new TypeError(`Mutation path ${mutationPath} does not belong to transaction path ${transactionPath}`)
-      }
-
-      mutate(mutationPath, mutation, node)
-    } else {
-      const oldRoot = this.root
-      const newRoot = this.root.$copy()
-      const node = mutate(mutationPath, mutation, newRoot)
-      this.root = newRoot
-      this.pubsub.publish(mutationPath, newRoot, oldRoot)
-      return node
+    if (this.mutationTarget) {
+      throw new TypeError(`Mutation already in progress at ${this.mutationTarget.$path.toSting()}`)
     }
+
+    const oldRoot = this.root
+    const newRoot = this.root.$copy()
+    const mutatedNode = mutate(mutationPath, mutation, newRoot)
+    this.root = newRoot
+    this.pubsub.publish(mutationPath, newRoot, oldRoot)
+    return mutatedNode
   }
 
   get state() {

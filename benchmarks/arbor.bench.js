@@ -40,14 +40,14 @@ benchmark.measure(`Arbor mutate all items within Array(${arrayLength})`, () => {
   })
 })
 
-benchmark.measure(`Arbor transactional mutation on a single item within Array(${arrayLength})`, () => {
-  largeStore.state.todos.$transaction(todos => {
+benchmark.measure(`Arbor: atomically mutates a single item within Array(${arrayLength})`, () => {
+  largeStore.state.todos.$mutate(todos => {
     todos[100].done = !todos[100].done
   })
 })
 
-benchmark.measure(`Arbor transactional mutation on all items within Array(${arrayLength})`, () => {
-  largeStore.state.todos.$transaction(todos => {
+benchmark.measure(`Arbor: atomically mutates all items within Array(${arrayLength})`, () => {
+  largeStore.state.todos.$mutate(todos => {
     todos.forEach(todo => { todo.done = !todo.done })
   })
 })

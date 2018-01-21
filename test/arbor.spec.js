@@ -48,12 +48,12 @@ describe("Arbor", () => {
       })
     })
 
-    it("mutates object node within a transaction", () => {
+    it("mutates object node atomically", () => {
       const tree = new Arbor({
         user: { name: "Jon" }
       })
 
-      tree.root.user.$transaction(user => {
+      tree.root.user.$mutate(user => {
         user.name = "Snow"
         user.active = true
       })
@@ -137,7 +137,7 @@ describe("Arbor", () => {
       ])
     })
 
-    it("mutates all array items within a transaction", () => {
+    it("mutates all array items atomically", () => {
       const tree = new Arbor({
         users: [
           { name: "Jon", age: 32 },
@@ -145,7 +145,7 @@ describe("Arbor", () => {
         ]
       })
 
-      tree.root.users.$transaction(users => {
+      tree.root.users.$mutate(users => {
         users.forEach(user => {
           user.age++
           user.active = true
@@ -652,8 +652,8 @@ describe("Arbor", () => {
     })
   })
 
-  describe("#$transaction", () => {
-    it("supports nested (stacked) transactions", () => {
+  describe("#$mutate", () => {
+    it("atomically mutates node", () => {
       const tree = new Arbor({
         users: [
           { name: "Jon", posts: [{ stars: 1 }, { stars: 2 }]},
@@ -661,21 +661,22 @@ describe("Arbor", () => {
         ]
       })
 
-      const users = tree.root.users.$transaction(users => {
+      const users = tree.root.users.$mutate(users => {
         users[0].posts.sort((post1, post2) => post2.stars - post1.stars)
         users[1].posts.sort((post1, post2) => post2.stars - post1.stars)
-        users[0].name = "stark"
+        users[0].name = "Stark"
         return users
       })
 
       expect(users).to.not.eq(tree.root.users)
-      expect(users).to.deep.eq([
-        { name: "stark", posts: [{ stars: 2 }, { stars: 1 }]},
+      expect(users).to.deep.eq(tree.root.users)
+      expect(tree.root.users).to.deep.eq([
+        { name: "Stark", posts: [{ stars: 2 }, { stars: 1 }]},
         { name: "Snow", posts: [{ stars: 10 }, { stars: 3 }]},
       ])
     })
 
-    it("throws an error when mutating node outside the transaction subtree", () => {
+    it("throws an error when nested mutations are present", () => {
       const tree = new Arbor({
         users: [
           { name: "Jon" },
@@ -683,11 +684,11 @@ describe("Arbor", () => {
         ]
       })
 
-      const invalidTransaction = () => tree.root.users[0].$transaction(user => {
+      const nestedMutation = () => tree.root.users[0].$mutate(user => {
         tree.root.users[1].name = "snow"
       })
 
-      expect(invalidTransaction).to.throw()
+      expect(nestedMutation).to.throw()
     })
   })
 

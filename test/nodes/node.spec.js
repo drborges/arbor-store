@@ -137,14 +137,6 @@ describe("Node", () => {
     })
   })
 
-  describe("#$transactionPath", () => {
-    it("constructs a trnasaction path for a given node", () => {
-      const tree = new Arbor({ user: { name: "Jon" } })
-
-      expect(tree.root.user.$transactionPath.toString()).to.eq("/user/.*")
-    })
-  })
-
   describe("#$copy", () => {
     it("creates a copy of the node", () => {
       const tree = new Arbor({ users: [{ name: "Jon" }] })
