@@ -20,6 +20,14 @@ export default class Path {
     return pattern.test(this.toString())
   }
 
+  walk(node) {
+    return this.props.reduce((parent, prop) => {
+      const child = parent[prop].$copy
+      parent.$value[prop] = child
+      return child
+    }, node)
+  }
+
   toString() {
     return `/${this.props.join("/")}`
   }
