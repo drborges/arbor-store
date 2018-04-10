@@ -14,6 +14,14 @@ describe("Path", () => {
     })
   })
 
+  describe(".constructor", () => {
+    it("caches paths based on their props", () => {
+      expect(new Path).to.eq(new Path)
+      expect(new Path(["todos"])).to.eq(new Path(["todos"]))
+      expect(Path.parse("/todos/0")).to.eq(Path.parse("/todos/0"))
+    })
+  })
+
   describe(".parse", () => {
     it("parses an empty string into a root Path object", () => {
       expect(Path.parse("")).to.deep.eq(new Path)

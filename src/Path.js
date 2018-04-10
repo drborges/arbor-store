@@ -1,4 +1,6 @@
 export default class Path {
+  static cache = {}
+
   static parse(str) {
     return new Path(str.split("/").filter(prop => prop !== ""))
   }
@@ -8,7 +10,13 @@ export default class Path {
   }
 
   constructor(props = []) {
-    this.props = props
+    const key = props.join("/")
+    if (!Path.cache[key]) {
+      this.props = props
+      Path.cache[key] = this
+    }
+
+    return Path.cache[key]
   }
 
   child(prop) {
