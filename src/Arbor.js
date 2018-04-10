@@ -3,17 +3,44 @@ import PubSub from "./PubSub"
 import NodeFactory from "./NodeFactory"
 import TypeRegistry from "./TypeRegistry"
 
-export default class Arbor {
-  constructor(state = {}) {
-    this.nodes = new WeakMap
-    this.types = new TypeRegistry
-    this.subscriptions = new PubSub
-    this.nodeFactory = new NodeFactory(this)
-    this.root = this.add(Path.root, state)
+class NodeCache {
+  byPath = new WeakMap
+  byValue = new WeakMap
+
+  set(value, node) {
+    this.byPath.set(node.$path, node)
+    this.byValue.set(value, node)
+  }
+}
+
+class Transactions {
+  mutationPoints = []
+
+  start(node) {
+    this.mutationPoints.push(node)
   }
 
-  has(value) {
-    return this.nodes.has(value)
+  commit() {
+    return this.mutationPoints.pop()
+  }
+
+  current() {
+    return this.mutationPoints[this.mutationPoints.length-1]
+  }
+
+  empty() {
+    return this.mutationPoints.length === 0
+  }
+}
+
+export default class Arbor {
+  constructor(state = {}) {
+    this.nodes = new NodeCache
+    this.types = new TypeRegistry
+    this.subscriptions = new PubSub
+    this.transactions = new Transactions
+    this.nodeFactory = new NodeFactory(this)
+    this.root = this.add(Path.root, state)
   }
 
   add(path, value) {
@@ -30,18 +57,20 @@ export default class Arbor {
     this.types.register(path, Type)
   }
 
-  get(value) {
-    return this.nodes.get(value)
-  }
+  mutate(path, mutation) {
+    const nextState = this.transactions.current() || this.root.$copy
+    const mutationPath = nextState.$path.complement(path)
+    const targetNode = mutationPath.walk(nextState)
 
-  mutate(mutationPath, mutation) {
-    const previousStateRoot = this.root
-    const nextStateRoot = this.root.$copy
-    const targetNode = mutationPath.walk(nextStateRoot)
+    this.transactions.start(targetNode)
     const result = mutation(targetNode)
+    this.transactions.commit()
 
-    this.root = nextStateRoot
-    this.subscriptions.notify(nextStateRoot, previousStateRoot)
+    if (this.transactions.empty()) {
+      const previousState = this.root
+      this.root = nextState
+      this.subscriptions.notify(nextState, previousState)
+    }
 
     return result
   }
