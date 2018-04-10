@@ -79,4 +79,38 @@ describe("Path", () => {
       expect(path.match(pattern)).to.eq(false)
     })
   })
+
+  describe("#complement", () => {
+    it("returns the complementary path computed against the given one", () => {
+      const path1 = Path.parse("/todos/0")
+      const path2 = Path.parse("/todos/0/comments/2")
+      const complement = path1.complement(path2)
+
+      expect(complement).to.deep.eq(Path.parse("/comments/2"))
+    })
+
+    it("returns an empty path if paths are the same", () => {
+      const path1 = Path.parse("/todos/0")
+      const path2 = Path.parse("/todos/0")
+      const complement = path1.complement(path2)
+
+      expect(complement).to.eq(new Path)
+    })
+
+    it("returns an empty path if there is no path intersection", () => {
+      const path1 = Path.parse("/todos/0")
+      const path2 = Path.parse("/does/not/intersect")
+      const complement = path1.complement(path2)
+
+      expect(complement).to.deep.eq(new Path)
+    })
+
+    it("returns the target path when computing complement off of root path", () => {
+      const path1 = Path.parse("/")
+      const path2 = Path.parse("/todos/0")
+      const complement = path1.complement(path2)
+
+      expect(complement).to.deep.eq(path2)
+    })
+  })
 })

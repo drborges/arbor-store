@@ -28,11 +28,21 @@ export default class Path {
     return pattern.test(this.toString())
   }
 
+  complement(path) {
+    if (this.props.length === 0) return path
+    const complementIndex = path.props.findIndex((prop, i) => prop !== this.props[i])
+    switch (complementIndex) {
+      case 0:
+      case -1: return new Path
+      default: return new Path(path.props.slice(complementIndex))
+    }
+  }
+
   walk(node) {
     return this.props.reduce((parent, prop) => {
-      const child = parent[prop].$copy
-      parent.$value[prop] = child
-      return child
+      const childCopy = parent[prop].$copy
+      parent.$value[prop] = childCopy
+      return childCopy
     }, node)
   }
 
