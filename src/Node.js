@@ -34,17 +34,19 @@ export default class Node {
     }
 
     const targetValue = Reflect.get(target, prop, receiver)
-    if (!this.$tree.canProxify(targetValue)) {
-      return targetValue
+    const childValue = targetValue && targetValue.$value || targetValue
+
+    if (!this.$tree.canProxify(childValue)) {
+      return childValue
     }
 
     const childPath = this.$path.child(prop)
-    if (!this.$tree.nodes.byValue.has(targetValue)) {
-      this.$tree.add(childPath, targetValue)
+    if (!this.$tree.nodes.byValue.has(childValue)) {
+      this.$tree.add(childPath, childValue)
     }
 
-    const child = this.$tree.nodes.byValue.get(targetValue)
-    child.$path = this.$path.child(prop)
+    const child = this.$tree.nodes.byValue.get(childValue)
+    child.$path = childPath
     return child
   }
 

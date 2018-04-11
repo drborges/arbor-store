@@ -517,6 +517,7 @@ describe("Arbor", () => {
       it("keeps node items' paths up-to-date", () => {
         const tree = new Arbor(initialState)
 
+        tree.state.todos[1].status = "done"
         tree.state.todos.splice(0, 1)
 
         expect(tree.state.todos[0].$path.toString()).to.eq("/todos/0")
