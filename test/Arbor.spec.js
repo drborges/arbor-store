@@ -225,6 +225,16 @@ describe("Arbor", () => {
 
         expect(tree.state.todos[0].$path.toString()).to.eq("/todos/0")
       })
+
+      it("triggers a single mutation", () => {
+        const tree = new Arbor(initialState)
+        const subscriber = sinon.spy()
+
+        tree.subscribe(subscriber)
+        tree.state.todos.pop()
+
+        expect(subscriber).to.have.been.calledOnce
+      })
     })
 
     describe("#shift", () => {
@@ -268,6 +278,16 @@ describe("Arbor", () => {
         tree.state.todos.shift()
 
         expect(tree.state.todos[0].$path.toString()).to.eq("/todos/0")
+      })
+
+      it("triggers a single mutation", () => {
+        const tree = new Arbor(initialState)
+        const subscriber = sinon.spy()
+
+        tree.subscribe(subscriber)
+        tree.state.todos.shift()
+
+        expect(subscriber).to.have.been.calledOnce
       })
     })
 
@@ -330,6 +350,19 @@ describe("Arbor", () => {
         expect(tree.state.todos[2].$path.toString()).to.eq("/todos/2")
         expect(tree.state.todos[3].$path.toString()).to.eq("/todos/3")
       })
+
+      it("triggers a single mutation", () => {
+        const tree = new Arbor(initialState)
+        const subscriber = sinon.spy()
+
+        tree.subscribe(subscriber)
+        tree.state.todos.unshift(
+          { id: 3, status: "todo" },
+          { id: 4, status: "todo" },
+        )
+
+        expect(subscriber).to.have.been.calledOnce
+      })
     })
 
     describe("#copyWithin", () => {
@@ -376,6 +409,16 @@ describe("Arbor", () => {
         expect(tree.state.todos[0].$path.toString()).to.eq("/todos/0")
         expect(tree.state.todos[1].$path.toString()).to.eq("/todos/0")
       })
+
+      it("triggers a single mutation", () => {
+        const tree = new Arbor(initialState)
+        const subscriber = sinon.spy()
+
+        tree.subscribe(subscriber)
+        tree.state.todos.copyWithin(1, 0, 1)
+
+        expect(subscriber).to.have.been.calledOnce
+      })
     })
 
     describe("#sort", () => {
@@ -420,6 +463,16 @@ describe("Arbor", () => {
 
         expect(tree.state.todos[0].$path.toString()).to.eq("/todos/0")
         expect(tree.state.todos[1].$path.toString()).to.eq("/todos/1")
+      })
+
+      it("triggers a single mutation", () => {
+        const tree = new Arbor(initialState)
+        const subscriber = sinon.spy()
+
+        tree.subscribe(subscriber)
+        tree.state.todos.sort((a, b) => b.id - a.id)
+
+        expect(subscriber).to.have.been.calledOnce
       })
     })
 
@@ -520,6 +573,16 @@ describe("Arbor", () => {
 
         expect(tree.state.todos[0].$path.toString()).to.eq("/todos/0")
         expect(tree.state.todos[1].$path.toString()).to.eq("/todos/1")
+      })
+
+      it("triggers a single mutation", () => {
+        const tree = new Arbor(initialState)
+        const subscriber = sinon.spy()
+
+        tree.subscribe(subscriber)
+        tree.state.todos.reverse()
+
+        expect(subscriber).to.have.been.calledOnce
       })
     })
   })
