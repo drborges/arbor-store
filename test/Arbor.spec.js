@@ -407,7 +407,7 @@ describe("Arbor", () => {
         tree.state.todos.copyWithin(1, 0, 1)
 
         expect(tree.state.todos[0].$path.toString()).to.eq("/todos/0")
-        expect(tree.state.todos[1].$path.toString()).to.eq("/todos/0")
+        expect(tree.state.todos[1].$path.toString()).to.eq("/todos/1")
       })
 
       it("triggers a single mutation", () => {

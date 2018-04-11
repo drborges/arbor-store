@@ -38,14 +38,22 @@ export default class Node {
       return targetValue
     }
 
+    const childPath = this.$path.child(prop)
     if (!this.$tree.nodes.byValue.has(targetValue)) {
-      this.$tree.add(this.$path.child(prop), targetValue)
+      this.$tree.add(childPath, targetValue)
     }
 
-    return this.$tree.nodes.byValue.get(targetValue)
+    const child = this.$tree.nodes.byValue.get(targetValue)
+    child.$path = this.$path.child(prop)
+    return child
   }
 
   set(target, prop, value, receiver) {
+    if (this[prop] !== undefined) {
+      this[prop] = value
+      return true
+    }
+
     this.$tree.mutate(this.$path, (node) => {
       node.$value[prop] = value
     })
