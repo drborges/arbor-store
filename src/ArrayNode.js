@@ -13,6 +13,10 @@ export default class ArrayNode extends Node {
     })
   }
 
+  push(item) {
+    return this.$tree.mutate(this.$path, node => node.$value.push(item))
+  }
+
   pop() {
     return this.$tree.mutate(this.$path, node => node.$value.pop())
   }

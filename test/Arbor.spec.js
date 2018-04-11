@@ -171,6 +171,16 @@ describe("Arbor", () => {
         expect(tree.state.todos[0].$path.toString()).to.eq("/todos/0")
         expect(tree.state.todos[1].$path.toString()).to.eq("/todos/1")
       })
+
+      it("triggers a single mutation", () => {
+        const tree = new Arbor(initialState)
+        const subscriber = sinon.spy()
+
+        tree.subscribe(subscriber)
+        tree.state.todos.push({ id: 3, status: "todo" })
+
+        expect(subscriber).to.have.been.calledOnce
+      })
     })
 
     describe("#pop", () => {
@@ -454,11 +464,19 @@ describe("Arbor", () => {
       it("keeps node items' paths up-to-date", () => {
         const tree = new Arbor(initialState)
 
-        tree.state.todos.splice(0, 1, { id: 3, status: "todo" }, { id: 4, status: "todo" })
+        tree.state.todos.splice(0, 1)
 
         expect(tree.state.todos[0].$path.toString()).to.eq("/todos/0")
-        expect(tree.state.todos[1].$path.toString()).to.eq("/todos/1")
-        expect(tree.state.todos[2].$path.toString()).to.eq("/todos/2")
+      })
+
+      it("triggers a single mutation", () => {
+        const tree = new Arbor(initialState)
+        const subscriber = sinon.spy()
+
+        tree.subscribe(subscriber)
+        tree.state.todos.splice(0, 1)
+
+        expect(subscriber).to.have.been.calledOnce
       })
     })
 
