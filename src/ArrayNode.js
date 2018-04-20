@@ -7,9 +7,8 @@ export default class ArrayNode extends Node {
 
   copyWithin(target, start, end) {
     return this.$tree.mutate(this.$path, node => {
-      const value = node.$value
-      value.copyWithin(target, start, end)
-      return this.$tree.nodes.byValue.get(value)
+      node.$value.copyWithin(target, start, end)
+      return node
     })
   }
 
@@ -23,9 +22,8 @@ export default class ArrayNode extends Node {
 
   reverse() {
     return this.$tree.mutate(this.$path, node => {
-      const value = node.$value
-      value.reverse()
-      return this.$tree.nodes.byValue.get(value)
+      node.$value.reverse()
+      return node
     })
   }
 
@@ -35,9 +33,8 @@ export default class ArrayNode extends Node {
 
   sort(fn) {
     return this.$tree.mutate(this.$path, node => {
-      const value = node.$value
-      value.sort(fn)
-      return this.$tree.nodes.byValue.get(value)
+      node.$value.sort(fn)
+      return node
     })
   }
 
