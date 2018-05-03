@@ -76,10 +76,10 @@ export default class Arbor {
   }
 
   canProxify(value) {
-    return value !== undefined && value !== null && (
-      value.constructor === Object ||
-      value.constructor === Array
-    )
+    const constructor = value && value.constructor
+    return this.types.has(constructor) ||
+      constructor === Object ||
+      constructor === Array
   }
 
   subscribe(subscriber) {

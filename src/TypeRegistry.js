@@ -13,4 +13,8 @@ export default class TypeRegistry {
   register(path, Type) {
     this.types[path.toString()] = Type
   }
+
+  has(type) {
+    return Object.values(this.types).includes(type)
+  }
 }
