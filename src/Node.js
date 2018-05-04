@@ -51,8 +51,8 @@ export default class Node {
   }
 
   set(target, prop, value, receiver) {
-    if (this[prop] !== undefined) {
-      this[prop] = value
+    if (prop === "$path") {
+      this.$path = value
       return true
     }
 
