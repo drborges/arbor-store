@@ -41,7 +41,7 @@ export default class Path {
   walk(node) {
     return this.props.reduce((parent, prop) => {
       const childCopy = parent[prop].$copy
-      parent.$value[prop] = childCopy
+      parent.$value[prop] = childCopy.$value
       return childCopy
     }, node)
   }

@@ -26,21 +26,18 @@ export default class Node {
       return proxyHandlerValue
     }
 
-    // Within $mutate blocks, read operations are always against the most
-    // up-to-date version of the tree. Therefore, the target proxied value must
-    // be refreshed so the most up-to-date value is used from this point on.
     if (!this.$tree.transactions.empty()) {
       target = this.$refreshed.$value
     }
 
-    const targetValue = Reflect.get(target, prop, receiver)
-    const childValue = targetValue && targetValue.$value || targetValue
+    const childValue  = Reflect.get(target, prop, receiver)
 
     if (!this.$tree.canProxify(childValue)) {
       return childValue
     }
 
     const childPath = this.$path.child(prop)
+
     if (!this.$tree.nodes.byValue.has(childValue)) {
       this.$tree.add(childPath, childValue)
     }
