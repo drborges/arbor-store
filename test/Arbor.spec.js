@@ -102,7 +102,7 @@ describe("Arbor", () => {
         const comment = todos[0].comments[0]
         comment.views++
         comment.views++
-        expect(comment.$refreshed.views).to.eq(2)
+        expect(comment.views).to.eq(2)
       })
 
       expect(tree.state.todos[0].comments).to.deep.eq([

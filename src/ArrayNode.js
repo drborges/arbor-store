@@ -1,10 +1,6 @@
 import Node from "./Node"
 
 export default class ArrayNode extends Node {
-  constructor(tree, path, node) {
-    super(tree, path, node)
-  }
-
   copyWithin(target, start, end) {
     return this.$tree.mutate(this.$path, node => {
       node.$value.copyWithin(target, start, end)

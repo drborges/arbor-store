@@ -22,7 +22,7 @@ export default class Node {
   get(target, prop, receiver) {
     const proxyHandlerValue = Reflect.get(this, prop, receiver)
 
-    if (proxyHandlerValue !== undefined) {
+    if (proxyHandlerValue) {
       return proxyHandlerValue
     }
 
@@ -39,7 +39,7 @@ export default class Node {
     const childPath = this.$path.child(prop)
 
     if (!this.$tree.nodes.byValue.has(childValue)) {
-      this.$tree.add(childPath, childValue)
+      return this.$tree.add(childPath, childValue)
     }
 
     const child = this.$tree.nodes.byValue.get(childValue)
