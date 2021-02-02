@@ -180,6 +180,3 @@ Arbor leverages **Structural Sharing** in order to perform state mutations. A ne
 
 ![2017-12-14 20 51 16](https://user-images.githubusercontent.com/508128/34018352-9d031a56-e110-11e7-9e3f-9f30a3c2e8ad.gif)
 
-# License
-
-MIT
